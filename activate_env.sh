@@ -7,7 +7,8 @@ conda activate linkedin-feed-capture
 
 echo "✅ Environment activated!"
 echo "🔧 Available commands:"
-echo "  python complete_linkedin_scraper.py --help"
+echo "  🌟 python complete_linkedin_scraper_enhanced_fast.py --help  # PRIMARY RECOMMENDATION"
+echo "  python complete_linkedin_scraper.py --help                  # Standard (limited)"
 echo "  python setup_credentials.py"
 echo "  pytest tests/"
 echo "  python simple_linkedin_test.py"
