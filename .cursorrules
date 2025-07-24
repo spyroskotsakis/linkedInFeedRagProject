@@ -1,5 +1,96 @@
 # Cursor AI Rules for LinkedIn Feed Capture Project
 
+## Environment Management
+
+### CRITICAL: Always Use Isolated Environment
+- **NEVER** use the base conda environment or system Python for this project
+- **ALWAYS** activate the appropriate isolated environment before running any Python commands
+- **PREFER** conda environment (`linkedin-feed-capture`) when available
+- **FALLBACK** to virtual environment (`venv`) when conda is not available
+- Before executing ANY Python script or test, verify the correct environment is active
+
+### Environment Detection & Activation
+```bash
+# Check if conda environment exists
+conda env list | grep linkedin-feed-capture
+
+# If conda environment exists, use it:
+source activate_env.sh
+
+# If no conda environment, check for virtual environment:
+ls -la venv/
+
+# If virtual environment exists, activate it:
+source venv/bin/activate
+
+# Verify environment
+python verify_env.py
+```
+
+### Environment Setup Commands
+```bash
+# Conda setup (preferred)
+./setup_conda_env.sh
+
+# Virtual environment setup (alternative)
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+### Prohibited Commands
+- ❌ `python script.py` (without environment check)
+- ❌ `pip install` (in base environment)
+- ❌ Running tests in base environment
+- ❌ Using system Python
+
+### Required Commands
+- ✅ `source activate_env.sh && python script.py` (conda)
+- ✅ `source venv/bin/activate && python script.py` (virtual env)
+- ✅ Always verify: `which python` shows environment path
+- ✅ Always verify: `python verify_env.py` passes
+
+## Dependency Management
+
+### CRITICAL: Synchronize Dependencies
+When adding new dependencies, **ALWAYS** update both:
+1. **Conda environment**: `environment.yml`
+2. **Virtual environment**: `requirements.txt`
+
+### Adding New Dependencies
+```bash
+# 1. Add to environment.yml (conda section)
+# 2. Add to requirements.txt (pip section)
+# 3. Update both environments:
+
+# For conda users:
+conda env update -f environment.yml
+
+# For virtual env users:
+pip install -r requirements.txt
+```
+
+### Dependency Verification
+```bash
+# Verify all dependencies are available in both environments
+python -c "
+import sys
+packages = ['selenium', 'beautifulsoup4', 'pydantic', 'typer', 'rich', 'webdriver_manager']
+missing = []
+for pkg in packages:
+    try:
+        __import__(pkg)
+    except ImportError:
+        missing.append(pkg)
+if missing:
+    print(f'❌ Missing packages: {missing}')
+    sys.exit(1)
+else:
+    print('✅ All core packages available')
+"
+```
+
 ## Knowledge Base
 The `documents/` folder contains comprehensive Selenium documentation and should be referenced for:
 - Selenium best practices and patterns
@@ -64,17 +155,18 @@ The `documents/` folder contains comprehensive Selenium documentation and should
 - Test error conditions and edge cases
 - Maintain test coverage above 80%
 - Use property-based testing for complex data validation
+- **ALWAYS** run tests in the isolated environment: `source activate_env.sh && pytest` or `source venv/bin/activate && pytest`
 
 ### Dependencies & Environment
-- Pin dependency versions in requirements files
-- Use virtual environments for development
+- Pin dependency versions in environment.yml and requirements.txt
+- Use isolated environments for development and production
 - Document system requirements clearly
 - Provide Docker containers for consistent environments
 - Use semantic versioning for releases
 - Keep dependencies up to date and secure
 
 ### Documentation Requirements
-- Maintain comprehensive README with setup instructions
+- Maintain comprehensive README with setup instructions for both conda and virtual environments
 - Document all environment variables and configuration options
 - Include troubleshooting guides for common issues
 - Provide examples of typical usage patterns
@@ -82,9 +174,9 @@ The `documents/` folder contains comprehensive Selenium documentation and should
 - Keep architectural decisions recorded
 
 ### CI/CD Pipeline
-- Run linting (ruff, black) on all commits
-- Execute type checking with mypy --strict
-- Run full test suite on pull requests
+- Run linting (ruff, black) on all commits in isolated environment
+- Execute type checking with mypy --strict in isolated environment
+- Run full test suite on pull requests in isolated environment
 - Build and test Docker images
 - Scan for security vulnerabilities
 - Enforce code coverage thresholds
@@ -143,4 +235,76 @@ The `documents/` folder contains comprehensive Selenium documentation and should
 - Keep comments up to date with code changes
 - Use TODO comments with assignee and date
 
+## Environment Enforcement
+
+### Pre-execution Checklist
+Before running ANY Python command:
+1. Check active environment: `conda info --envs | grep '*'` or `echo $VIRTUAL_ENV`
+2. If not in isolated environment, activate appropriate one:
+   - Conda: `source activate_env.sh`
+   - Virtual env: `source venv/bin/activate`
+3. Verify Python path: `which python` (should show environment path)
+4. Verify packages: `python verify_env.py`
+
+### Command Templates
+Always use these patterns:
+
+```bash
+# For conda environment
+source activate_env.sh && python complete_linkedin_scraper.py --posts 5
+
+# For virtual environment
+source venv/bin/activate && python complete_linkedin_scraper.py --posts 5
+
+# For testing (conda)
+source activate_env.sh && pytest tests/unit/ -v
+
+# For testing (virtual env)
+source venv/bin/activate && pytest tests/unit/ -v
+
+# For package installation (conda)
+source activate_env.sh && conda install package_name
+
+# For package installation (virtual env)
+source venv/bin/activate && pip install package_name
+```
+
+### Environment Verification
+Before any development session:
+```bash
+# Quick verification
+python verify_env.py
+
+# Full verification
+python -c "
+import sys
+print(f'Python: {sys.executable}')
+print(f'Environment: {'linkedin-feed-capture' in sys.executable or 'venv' in sys.executable}')
+"
+```
+
+## File Organization Rules
+
+### Data Structure Enforcement
+- All extraction outputs MUST go in organized subfolders: `data/posts_{count}/`
+- Each extraction MUST generate 5 files: main JSON, analytics, CSV, quality posts, summary
+- File naming MUST include timestamps to prevent conflicts
+- Custom output files MUST be placed in the organized subfolder structure
+
+### Project Files
+- `environment.yml` - Conda dependencies (NEVER modify without team approval)
+- `requirements.txt` - Virtual environment dependencies (synchronized with environment.yml)
+- `setup_conda_env.sh` - Environment setup automation
+- `activate_env.sh` - Daily environment activation
+- `verify_env.py` - Environment validation
+- `.cursorrules` - This file (update with care)
+
 Remember: This project involves web scraping which has legal and ethical considerations. Always ensure compliance with terms of service and applicable laws.
+
+## SUMMARY: CRITICAL ENVIRONMENT RULES
+1. **NEVER** use base conda environment or system Python
+2. **ALWAYS** activate isolated environment first (conda preferred, virtual env fallback)
+3. **VERIFY** environment before each session: `python verify_env.py`
+4. **USE** automation scripts: `./setup_conda_env.sh` or manual virtual env setup
+5. **SYNCHRONIZE** dependencies between conda and virtual environments
+6. **MAINTAIN** organized data structure in subfolders
