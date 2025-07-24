@@ -1,0 +1,146 @@
+# Cursor AI Rules for LinkedIn Feed Capture Project
+
+## Knowledge Base
+The `documents/` folder contains comprehensive Selenium documentation and should be referenced for:
+- Selenium best practices and patterns
+- WebDriver configurations and capabilities
+- Browser automation strategies
+- Anti-detection techniques
+- Error handling and troubleshooting
+
+## Code Architecture Rules
+
+### Project Structure
+- Follow the established modular structure: `cli/`, `auth/`, `browser/`, `scraper/`, `models/`, `utils/`
+- Each module should have a single responsibility
+- Use absolute imports from the project root: `from linkedin_feed_capture.scraper import ScrollManager`
+- Keep related functionality together in logical modules
+
+### Python Best Practices
+- Use type hints for all function parameters and return values
+- Follow PEP 8 style guidelines
+- Use dataclasses or Pydantic models for structured data
+- Implement proper error handling with specific exception types
+- Use logging instead of print statements
+- Write docstrings for all public functions and classes
+
+### Web Scraping & Selenium Guidelines
+- Always use explicit waits instead of time.sleep()
+- Implement retry mechanisms with exponential backoff
+- Use CSS selectors or XPath that are resilient to DOM changes
+- Add stealth measures to avoid detection (user agents, viewport sizes, timing)
+- Handle common anti-scraping measures (CAPTCHAs, rate limits, IP blocks)
+- Persist authentication cookies to minimize login frequency
+- Randomize delays and human-like behavior patterns
+
+### Security & Compliance
+- Never hardcode credentials in source code
+- Use environment variables for all sensitive configuration
+- Respect robots.txt and terms of service
+- Implement proper session management
+- Log security-relevant events for audit trails
+- Store scraped data securely and with proper retention policies
+
+### Error Handling
+- Use specific exception classes for different error types
+- Implement graceful degradation when possible
+- Log errors with sufficient context for debugging
+- Provide clear error messages to users
+- Handle network timeouts and connection issues
+- Implement circuit breaker patterns for external services
+
+### Performance & Reliability
+- Use connection pooling for HTTP requests
+- Implement proper resource cleanup (close drivers, connections)
+- Monitor memory usage and prevent leaks
+- Use async/await patterns where appropriate
+- Implement health checks and monitoring endpoints
+- Cache frequently accessed data appropriately
+
+### Testing Strategy
+- Write unit tests for business logic
+- Create integration tests for browser interactions
+- Use mocking for external dependencies
+- Test error conditions and edge cases
+- Maintain test coverage above 80%
+- Use property-based testing for complex data validation
+
+### Dependencies & Environment
+- Pin dependency versions in requirements files
+- Use virtual environments for development
+- Document system requirements clearly
+- Provide Docker containers for consistent environments
+- Use semantic versioning for releases
+- Keep dependencies up to date and secure
+
+### Documentation Requirements
+- Maintain comprehensive README with setup instructions
+- Document all environment variables and configuration options
+- Include troubleshooting guides for common issues
+- Provide examples of typical usage patterns
+- Document API interfaces and data schemas
+- Keep architectural decisions recorded
+
+### CI/CD Pipeline
+- Run linting (ruff, black) on all commits
+- Execute type checking with mypy --strict
+- Run full test suite on pull requests
+- Build and test Docker images
+- Scan for security vulnerabilities
+- Enforce code coverage thresholds
+
+### Monitoring & Observability
+- Use structured logging with consistent formats
+- Implement metrics collection for key operations
+- Add distributed tracing for complex workflows
+- Monitor scraping success rates and error patterns
+- Track resource usage and performance metrics
+- Set up alerting for critical failures
+
+## Selenium-Specific Rules
+
+### Driver Management
+- Use driver factories for consistent configuration
+- Implement proper driver lifecycle management
+- Use headless mode in production environments
+- Configure appropriate timeouts for different operations
+- Handle driver crashes and recovery gracefully
+
+### Element Interaction
+- Always check element visibility before interaction
+- Use ActionChains for complex user interactions
+- Implement scroll strategies that mimic human behavior
+- Handle stale element references properly
+- Use frame switching when dealing with iframes
+
+### Data Extraction
+- Validate extracted data against expected schemas
+- Handle missing or changed DOM elements gracefully
+- Implement deduplication strategies for repeated content
+- Parse timestamps and dates consistently
+- Extract structured data with proper type conversion
+
+## Code Quality Standards
+
+### Naming Conventions
+- Use descriptive variable and function names
+- Follow Python naming conventions (snake_case for functions, PascalCase for classes)
+- Use meaningful constant names in UPPER_CASE
+- Prefix private methods with underscore
+- Use verb-noun pattern for function names
+
+### Code Organization
+- Keep functions small and focused (< 20 lines ideally)
+- Use composition over inheritance
+- Implement dependency injection for testability
+- Separate configuration from business logic
+- Group related constants and enums together
+
+### Comments & Documentation
+- Write self-documenting code that minimizes comment needs
+- Add comments for complex algorithms or business logic
+- Document why something is done, not just what is done
+- Keep comments up to date with code changes
+- Use TODO comments with assignee and date
+
+Remember: This project involves web scraping which has legal and ethical considerations. Always ensure compliance with terms of service and applicable laws.
