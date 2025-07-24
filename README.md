@@ -112,7 +112,22 @@ python setup_credentials.py
 
 ### 2. **Run the Scraper**
 
-#### **Main Production Script**
+#### **🎯 Production Script (Recommended for Daily Operations)**
+```bash
+# Daily production run (2000 posts, optimized for reliability)
+python linkedin_scraper_production.py --posts 2000 --headless
+
+# Interactive mode (asks for post count)
+python linkedin_scraper_production.py
+
+# Debug mode with visible browser (recommended for first-time setup)
+python linkedin_scraper_production.py --posts 50 --verbose
+
+# Custom batch processing
+python linkedin_scraper_production.py --posts 500 --batch-size 100 --headless
+```
+
+#### **🔧 Standard Script (Basic Operations)**
 ```bash
 # Interactive mode (asks for post count)
 python complete_linkedin_scraper.py
@@ -127,14 +142,85 @@ python complete_linkedin_scraper.py --posts 25 --verbose
 python complete_linkedin_scraper.py --posts 50 --headless
 ```
 
-#### **Command Line Options**
+#### **📋 Complete Command Line Options**
+
+**Production Script Options:**
 ```bash
-Options:
+python linkedin_scraper_production.py [OPTIONS]
+
+Required:
+  -n, --posts N         Number of posts to extract (recommended: 2000 for daily ops)
+
+Optional:
+  --headless           Run browser in headless mode (recommended for automation)
+  --verbose, -v        Enable verbose output with post previews and detailed logs
+  --batch-size N       Batch size for memory management (default: 100)
+  --help              Show help message and examples
+
+Examples:
+  # Daily automated run
+  python linkedin_scraper_production.py --posts 2000 --headless
+  
+  # Debug/setup run (visible browser for security challenges)
+  python linkedin_scraper_production.py --posts 25 --verbose
+  
+  # Large batch with custom processing
+  python linkedin_scraper_production.py --posts 1000 --batch-size 200 --headless
+```
+
+**Standard Script Options:**
+```bash
+python complete_linkedin_scraper.py [OPTIONS]
+
+Optional:
   -n, --posts N         Number of posts to extract
   --headless           Run browser in headless mode
   --verbose, -v        Enable verbose output with post previews
   --help              Show help message
+
+Examples:
+  # Interactive mode
+  python complete_linkedin_scraper.py
+  
+  # Quick extraction
+  python complete_linkedin_scraper.py --posts 10 --verbose
+  
+  # Automated run
+  python complete_linkedin_scraper.py --posts 100 --headless
 ```
+
+#### **🔒 Security Challenge Handling**
+
+LinkedIn may present security challenges (captchas) during login. Here's how to handle them:
+
+**For Interactive Setup (Recommended for First Run):**
+```bash
+# Run in visible mode to manually complete security challenges
+python linkedin_scraper_production.py --posts 50 --verbose
+# OR
+python complete_linkedin_scraper.py --posts 10 --verbose
+
+# When prompted:
+# 1. Complete the security challenge in the browser window
+# 2. Wait for navigation to the LinkedIn feed
+# 3. Press Enter in the terminal when ready
+```
+
+**For Automated Production Runs:**
+```bash
+# Use headless mode after initial setup
+python linkedin_scraper_production.py --posts 2000 --headless
+
+# Note: If security challenges occur during automated runs,
+# the system will log the issue and gracefully exit.
+# Re-run in visible mode to resolve, then return to headless.
+```
+
+**Security Challenge Best Practices:**
+- ✅ **First-time setup:** Always use visible mode (`--verbose` without `--headless`)
+- ✅ **Production runs:** Use headless mode (`--headless`) for automation
+- ✅ **Troubleshooting:** Switch to visible mode if authentication issues occur
+- ✅ **Monitoring:** Check logs for authentication failures in automated runs
 
 ### 3. **Output Structure**
 ```
@@ -191,7 +277,10 @@ The scraper uses **proven working selectors** identified through extensive diagn
 
 ```
 linkedInFeedRagProject/
-├── complete_linkedin_scraper.py         # 🎯 Main production scraper (98%+ success rate)
+├── linkedin_scraper_production.py       # 🚀 Production scraper for daily 2000-post operations
+├── complete_linkedin_scraper.py         # 🎯 Standard scraper (98%+ success rate)
+├── production_logger.py                 # 📊 Production logging and error categorization
+├── production_recovery.py               # 🔄 Automatic retry and recovery mechanisms
 ├── setup_credentials.py                 # 🔐 Credential management
 ├── simple_linkedin_test.py              # 🧪 Quick connectivity test
 ├── verify_env.py                        # ✅ Environment validation
@@ -204,13 +293,21 @@ linkedInFeedRagProject/
 ├── tests/                               # 🧪 Unit and integration tests
 ├── src/linkedin_feed_capture/           # 📚 Modular library components
 ├── documents/                           # 📖 Selenium documentation
-├── logs/                                # 📝 Application logs
+├── logs/                                # 📝 Application logs (production logging)
 └── docker/                              # 🐳 Docker configuration
 ```
 
 ### **Core Scripts**
 
-#### **🎯 complete_linkedin_scraper.py** - Main Production Scraper
+#### **🚀 linkedin_scraper_production.py** - Production Scraper for Daily Operations
+- **Optimized for 2000-post daily extractions** with batch processing
+- **Comprehensive error handling** with categorized logging (connection/auth/content/logic)
+- **Automatic retry and recovery** mechanisms with circuit breaker patterns
+- **Production monitoring** with performance metrics and alerting
+- **Memory management** with automatic browser restarts for long operations
+- **Session persistence** and recovery for rate limit handling
+
+#### **🎯 complete_linkedin_scraper.py** - Standard Scraper
 - **98.8% extraction success rate** across all test scenarios
 - Advanced post validation and smart filtering
 - Comprehensive analytics and multiple output formats
