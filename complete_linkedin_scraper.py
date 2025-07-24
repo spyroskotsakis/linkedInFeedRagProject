@@ -390,9 +390,10 @@ def save_data(posts, output_file=None, pretty=True, post_count=None):
     if not post_count:
         post_count = len(posts)
     
-    # Create organized directory structure: data/posts_{count}/
+    # Create organized directory structure with human-readable date format
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    subfolder_name = f"posts_{post_count}"
+    date_friendly = datetime.now().strftime("%Y-%m-%d_%H-%M")  # Human-readable format
+    subfolder_name = f"posts_{post_count}_{date_friendly}"
     output_dir = Path("data") / subfolder_name
     
     if not output_file:

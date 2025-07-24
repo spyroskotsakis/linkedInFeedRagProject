@@ -598,149 +598,31 @@ python -m linkedin_feed_capture.cli.main test-connection
 python -m linkedin_feed_capture.cli.main auth-info
 ```
 
-## 📄 Output Formats
+## 📁 Output Formats
 
-### Organized Data Structure
-Each extraction creates a dedicated subfolder with comprehensive data organization:
+The scraper generates comprehensive data exports organized in timestamped folders:
 
+### Folder Structure
 ```
 data/
-├── posts_5/                          # 5 posts extraction
-│   ├── linkedin_feed_20240115_143022.json
-│   ├── analytics_20240115_143022.json
-│   ├── posts_analysis_20240115_143022.csv
-│   ├── quality_posts_20240115_143022.json
-│   └── extraction_summary_20240115_143022.txt
-├── posts_25/                         # 25 posts extraction
-│   ├── linkedin_feed_20240115_150030.json
-│   ├── analytics_20240115_150030.json
-│   ├── posts_analysis_20240115_150030.csv
-│   ├── quality_posts_20240115_150030.json
-│   └── extraction_summary_20240115_150030.txt
-└── posts_100/                        # 100 posts extraction
-    ├── linkedin_feed_20240115_160045.json
-    ├── analytics_20240115_160045.json
-    ├── posts_analysis_20240115_160045.csv
-    ├── quality_posts_20240115_160045.json
-    └── extraction_summary_20240115_160045.txt
+├── posts_1_2025-07-24_13-19/           # 1 post extracted on July 24, 2025 at 13:19
+│   ├── linkedin_feed_20250724_131937.json    # Main data file
+│   ├── analytics_20250724_131937.json        # Engagement analytics
+│   ├── posts_analysis_20250724_131937.csv    # CSV for spreadsheet analysis
+│   ├── quality_posts_20250724_131937.json    # High-quality posts only
+│   └── extraction_summary_20250724_131937.txt # Human-readable summary
+├── posts_50_2025-07-24_14-30/          # 50 posts extracted on July 24, 2025 at 14:30
+│   └── ...
+└── posts_100_2025-07-25_09-15/         # 100 posts extracted on July 25, 2025 at 09:15
+    └── ...
 ```
 
 ### File Types Generated
-
-#### 1. Main Data File: `linkedin_feed_TIMESTAMP.json`
-Primary extraction data with complete post information:
-
-```json
-[
-  {
-    "urn": "urn:li:activity:7354048940184367105",
-    "author": "John Doe",
-    "author_url": "https://linkedin.com/in/johndoe",
-    "author_headline": "Senior Data Scientist at TechCorp",
-    "content": "Just built an amazing RAG system...",
-    "posted_at": "2024-01-15T10:30:00Z",
-    "engagement": {
-      "likes": 42,
-      "comments": 8,
-      "shares": 3
-    },
-    "hashtags": ["AI", "MachineLearning", "RAG"],
-    "media": {
-      "has_image": true,
-      "has_video": false,
-      "urls": ["https://media.licdn.com/..."]
-    },
-    "extracted_at": "2024-01-15T14:22:33.123456",
-    "post_url": "https://www.linkedin.com/posts/..."
-  }
-]
-```
-
-#### 2. Analytics File: `analytics_TIMESTAMP.json`
-Comprehensive extraction statistics and insights:
-
-```json
-{
-  "extraction_info": {
-    "timestamp": "2024-01-15T14:22:33Z",
-    "total_posts": 25,
-    "extraction_duration": "45s"
-  },
-  "engagement_metrics": {
-    "total_likes": 1250,
-    "total_comments": 245,
-    "total_shares": 67,
-    "average_likes": 50.0,
-    "high_engagement_posts": 5
-  },
-  "content_analysis": {
-    "posts_with_substantial_content": 18,
-    "posts_with_media": 12,
-    "average_content_length": 340,
-    "hashtag_count": 45
-  },
-  "top_posts": [...]
-}
-```
-
-#### 3. CSV Export: `posts_analysis_TIMESTAMP.csv`
-Spreadsheet-friendly format for analysis and filtering:
-
-```csv
-urn,author,author_headline,content_length,content_preview,likes,comments,shares,has_media,hashtag_count,extracted_at
-urn:li:activity:123,John Doe,Senior Engineer,1200,"Amazing AI breakthrough...",42,8,3,true,3,2024-01-15T14:22:33
-```
-
-#### 4. Quality Posts: `quality_posts_TIMESTAMP.json`
-Filtered dataset containing only high-value posts (>200 characters OR >10 likes):
-
-```json
-[
-  {
-    "urn": "...",
-    "content": "Substantial post with detailed insights...",
-    "engagement": {"likes": 125, "comments": 23}
-  }
-]
-```
-
-#### 5. Extraction Summary: `extraction_summary_TIMESTAMP.txt`
-Human-readable summary report:
-
-```
-LinkedIn Feed Extraction Summary
-==================================================
-Extraction Date: 2024-01-15 14:22:33
-Target Posts: 25
-Actual Posts Extracted: 25
-Success Rate: 100.0%
-
-Engagement Overview:
-- Total Likes: 1,250
-- Total Comments: 245
-- Posts with Media: 12
-- Posts with Substantial Content (>200 chars): 18
-
-Top Performing Posts:
-------------------------------
-1. 125 likes - Tech Expert
-   "Revolutionary AI breakthrough in natural language processing..."
-
-Files Generated:
-- linkedin_feed_TIMESTAMP.json (main data)
-- analytics_TIMESTAMP.json (detailed analytics)
-- posts_analysis_TIMESTAMP.csv (spreadsheet format)
-- quality_posts_TIMESTAMP.json (filtered high-value posts)
-- extraction_summary_TIMESTAMP.txt (this file)
-```
-
-### Folder Organization Benefits
-
-- **Easy Organization**: Each extraction is self-contained
-- **No File Conflicts**: Timestamp-based naming prevents overwrites
-- **Quick Access**: Find extractions by post count
-- **Complete Context**: All related files in one location
-- **Production Ready**: Structured for automated processing
+1. **Main JSON** (`linkedin_feed_*.json`): Complete post data with all extracted fields
+2. **Analytics JSON** (`analytics_*.json`): Engagement metrics, content analysis, and top posts
+3. **CSV Export** (`posts_analysis_*.csv`): Spreadsheet-friendly format for data analysis
+4. **Quality Posts** (`quality_posts_*.json`): Filtered posts with substantial content or high engagement
+5. **Summary TXT** (`extraction_summary_*.txt`): Human-readable summary with key statistics
 
 ## 📊 Data Schema
 
@@ -1476,7 +1358,7 @@ python complete_linkedin_scraper.py --posts 100 --verbose --no-headless --scroll
    docker run --rm linkedin-feed-capture python complete_linkedin_scraper.py --posts 2 --headless --verbose
    ```
 5. **Check data output:**
-   - Confirm files are created in `data/posts_{count}/` with all 5 expected files.
+   - Confirm files are created in `data/posts_{count}_{YYYY-MM-DD_HH-MM}/` with all 5 expected files.
 6. **Run all tests:**
    ```bash
    python tests/test_all.py
