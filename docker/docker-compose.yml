@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  linkedin-scraper:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: linkedin-feed-capture
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=:99
+    volumes:
+      - ../data:/app/data
+      - ../.env:/app/.env:ro
+    ports:
+      - "8000:8000"  # For future web interface
+    healthcheck:
+      test: ["CMD", "python", "-c", "import selenium, beautifulsoup4, pydantic; print('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    command: ["python", "complete_linkedin_scraper.py", "--posts", "5", "--headless", "--verbose"]
+
+  # Development service with volume mounting for live code changes
+  linkedin-scraper-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: linkedin-feed-capture-dev
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=:99
+    volumes:
+      - ../src:/app/src
+      - ../tests:/app/tests
+      - ../data:/app/data
+      - ../.env:/app/.env:ro
+      - ../requirements.txt:/app/requirements.txt
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import selenium, beautifulsoup4, pydantic; print('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    command: ["python", "complete_linkedin_scraper.py", "--posts", "2", "--headless", "--verbose"]
+
+  # Test service for running unit tests
+  linkedin-scraper-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: linkedin-feed-capture-test
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=:99
+    volumes:
+      - ../src:/app/src
+      - ../tests:/app/tests
+      - ../data:/app/data
+      - ../.env:/app/.env:ro
+    ports:
+      - "8002:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import selenium, beautifulsoup4, pydantic; print('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: "no"
+    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short"] 

@@ -1352,3 +1352,149 @@ pytest tests/smoke/ --env=production -v
 # Health check tests
 pytest tests/health/ -v
 ``` 
+
+## 🐳 Docker Usage
+
+### Build the Docker Image
+```bash
+docker build -t linkedin-feed-capture -f docker/Dockerfile .
+```
+
+### Run the Scraper in Docker
+```bash
+docker run --rm -it \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/.env:/app/.env:ro \
+  linkedin-feed-capture \
+  python complete_linkedin_scraper.py --posts 5 --headless --verbose
+```
+
+### Run the CLI Help in Docker
+```bash
+docker run --rm linkedin-feed-capture python complete_linkedin_scraper.py --help
+```
+
+### Use Docker Compose (for dev/test)
+```bash
+cd docker
+docker compose up --build linkedin-scraper
+```
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+### Run All Tests (Recommended)
+- **From host (venv or conda):**
+  ```bash
+  python tests/test_all.py
+  # or
+  pytest tests/test_all.py -v
+  ```
+- **From Docker:**
+  ```bash
+  docker run --rm linkedin-feed-capture python tests/test_all.py
+  ```
+- **With Docker Compose:**
+  ```bash
+  cd docker
+  docker compose up --build linkedin-scraper-test
+  ```
+
+### Unit Test Coverage
+| Test File                      | Description |
+|-------------------------------|-------------|
+| `test_dependencies.py`         | Validates all required dependencies, environment, and project structure. |
+| `test_all.py`                  | Runs a comprehensive suite: environment, dependencies, models, utils, integration, E2E, Docker, security, and documentation. |
+| `test_models.py`               | Tests data models (Post, PostMetrics) for correct validation and serialization. |
+| `test_utils.py`                | Tests utility functions (logger, backoff, etc). |
+| `test_auth.py`                 | Tests authentication and cookie management logic. |
+| `test_browser.py`              | Tests browser/driver setup and stealth configuration. |
+| `test_cli.py`                  | Tests CLI argument parsing and main entrypoint. |
+| `test_scraper.py`              | Tests scraping, parsing, and data extraction logic. |
+
+### How to Run a Specific Unit Test
+```bash
+pytest tests/unit/test_models.py -v
+```
+
+---
+
+## 🚀 CLI Usage & Options
+
+### Run the CLI (host or Docker)
+```bash
+python complete_linkedin_scraper.py --help
+```
+
+### Example CLI Commands
+```bash
+# Interactive mode (asks for post count)
+python complete_linkedin_scraper.py
+
+# Extract 50 posts, headless, verbose
+python complete_linkedin_scraper.py --posts 50 --headless --verbose
+
+# Custom output file
+python complete_linkedin_scraper.py -n 25 -o my_feed.json --headless
+
+# All options
+python complete_linkedin_scraper.py --posts 100 --verbose --no-headless --scroll-delay 3 --max-scrolls 100
+```
+
+### CLI Options
+| Option                  | Description |
+|-------------------------|-------------|
+| `-n, --posts`           | Number of posts to extract (default: ask interactively) |
+| `-o, --output`          | Output file path (default: auto-generated with timestamp) |
+| `--headless`            | Run browser in headless mode (invisible) |
+| `--no-headless`         | Run browser in visible mode (default) |
+| `--scroll-delay`        | Delay between scrolls in seconds (default: 2.0) |
+| `--max-scrolls`         | Maximum scroll attempts (default: 50) |
+| `--verbose, -v`         | Enable verbose output with detailed post previews |
+| `--pretty`              | Format JSON output with indentation (default: true) |
+| `--no-pretty`           | Compact JSON output without indentation |
+
+---
+
+## 🧑‍💻 Manual Testing Checklist
+
+1. **Run CLI help:**
+   ```bash
+   python complete_linkedin_scraper.py --help
+   ```
+2. **Run with default (interactive):**
+   ```bash
+   python complete_linkedin_scraper.py
+   ```
+3. **Run with all options:**
+   ```bash
+   python complete_linkedin_scraper.py --posts 5 --headless --verbose
+   ```
+4. **Run in Docker:**
+   ```bash
+   docker run --rm linkedin-feed-capture python complete_linkedin_scraper.py --posts 2 --headless --verbose
+   ```
+5. **Check data output:**
+   - Confirm files are created in `data/posts_{count}/` with all 5 expected files.
+6. **Run all tests:**
+   ```bash
+   python tests/test_all.py
+   # or
+   docker run --rm linkedin-feed-capture python tests/test_all.py
+   ```
+
+---
+
+## 📋 Test Summary Table
+| Test Type      | How to Run (host)                | How to Run (Docker)                                   |
+|----------------|----------------------------------|------------------------------------------------------|
+| All tests      | `python tests/test_all.py`        | `docker run --rm linkedin-feed-capture python tests/test_all.py` |
+| Unit only      | `pytest tests/unit/`              | `docker run --rm linkedin-feed-capture pytest tests/unit/` |
+| Integration    | `pytest tests/integration/`       | `docker run --rm linkedin-feed-capture pytest tests/integration/` |
+| E2E            | `pytest tests/e2e/`               | `docker run --rm linkedin-feed-capture pytest tests/e2e/` |
+| CLI            | `python complete_linkedin_scraper.py --help` | `docker run --rm linkedin-feed-capture python complete_linkedin_scraper.py --help` |
+
+---
+
+For more details, see the full documentation in this README and the `tests/` folder. 
