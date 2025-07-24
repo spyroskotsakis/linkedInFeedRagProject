@@ -130,20 +130,49 @@ def extract_post_data_optimized(post_element, index):
             log_extraction_stat("empty_posts_skipped")
             return None
         
-        # Initialize result with proven working structure
+        # Initialize result with ENHANCED schema structure
         result = {
             "urn": urn,
             "author": "Unknown Author",
-            "author_url": None,
-            "author_headline": None,
+            "author_metadata": {
+                "profile_url": "",
+                "profile_id": "", 
+                "avatar_url": "",
+                "is_verified": False,
+                "is_premium": False,
+                "connection_status": "",
+                "is_following": False,
+                "connection_degree": "",
+                "job_title": ""
+            },
             "content": "",
-            "posted_at": None,
-            "engagement": {"likes": 0, "comments": 0, "shares": 0},
+            "engagement": {
+                "likes": 0, 
+                "comments": 0, 
+                "shares": 0,
+                "reaction_types": [],
+                "total_reactions": 0
+            },
+            "timestamp": "",
             "hashtags": [],
             "media": {"has_image": False, "has_video": False, "urls": []},
-            "extracted_at": datetime.now().isoformat(),
-            "post_url": f"https://www.linkedin.com/posts/{urn}" if urn.startswith("urn:") else None
+            "url": "",
+            "post_metadata": {
+                "visibility": "",
+                "is_edited": False,
+                "text_direction": "ltr",
+                "post_type": ""
+            },
+            "extracted_at": datetime.now().isoformat()
         }
+        
+        # ENHANCED URL GENERATION from URN (100% reliable)
+        if urn:
+            try:
+                urn_id = urn.replace("urn:li:activity:", "")
+                result["url"] = f"https://www.linkedin.com/feed/update/urn:li:activity:{urn_id}/"
+            except Exception:
+                pass
         
         # Extract author using PROVEN working selectors
         author_selectors = [
@@ -270,6 +299,123 @@ def extract_post_data_optimized(post_element, index):
             except:
                 continue
         
+        # ENHANCED AUTHOR METADATA EXTRACTION
+        try:
+            # Find author container
+            actor_container = post_element.find_element(By.CSS_SELECTOR, ".update-components-actor__container")
+            
+            # Profile URL and ID
+            profile_link = actor_container.find_element(By.CSS_SELECTOR, "a[href*='/in/']")
+            if profile_link:
+                href = profile_link.get_attribute('href')
+                result["author_metadata"]["profile_url"] = href
+                
+                # Extract profile ID from URL
+                profile_match = re.search(r'/in/([^/?]+)', href)
+                if profile_match:
+                    result["author_metadata"]["profile_id"] = profile_match.group(1)
+                    
+            # Avatar URL
+            avatar_img = actor_container.find_element(By.CSS_SELECTOR, "img")
+            if avatar_img:
+                result["author_metadata"]["avatar_url"] = avatar_img.get_attribute('src')
+                
+            # Verification status
+            try:
+                actor_container.find_element(By.CSS_SELECTOR, "svg[data-test-icon='verified-small']")
+                result["author_metadata"]["is_verified"] = True
+            except:
+                pass
+                
+            # Premium status  
+            try:
+                actor_container.find_element(By.CSS_SELECTOR, "svg[class*='premium']")
+                result["author_metadata"]["is_premium"] = True
+            except:
+                pass
+                
+            # Connection status
+            try:
+                connection_elem = actor_container.find_element(By.CSS_SELECTOR, ".update-components-actor__supplementary-actor-info")
+                connection_text = connection_elem.text.strip()
+                result["author_metadata"]["connection_status"] = connection_text
+                result["author_metadata"]["is_following"] = "Following" in connection_text
+                
+                if "1st" in connection_text:
+                    result["author_metadata"]["connection_degree"] = "1st"
+                elif "2nd" in connection_text:
+                    result["author_metadata"]["connection_degree"] = "2nd"
+                elif "3rd" in connection_text:
+                    result["author_metadata"]["connection_degree"] = "3rd"
+            except:
+                pass
+                
+            # Job title
+            try:
+                description_elem = actor_container.find_element(By.CSS_SELECTOR, ".update-components-actor__description")
+                result["author_metadata"]["job_title"] = description_elem.text.strip()
+            except:
+                pass
+                
+        except Exception:
+            pass
+
+        # ENHANCED ENGAGEMENT EXTRACTION
+        try:
+            # Reaction types from icons
+            reaction_icons = post_element.find_elements(By.CSS_SELECTOR, "img[data-test-reactions-icon-type]")
+            reaction_types = []
+            for icon in reaction_icons:
+                reaction_type = icon.get_attribute('data-test-reactions-icon-type')
+                if reaction_type:
+                    reaction_types.append(reaction_type.lower())
+            result["engagement"]["reaction_types"] = list(set(reaction_types))
+            
+            # Update total reactions
+            if result["engagement"]["likes"] > 0:
+                result["engagement"]["total_reactions"] = result["engagement"]["likes"]
+                
+        except Exception:
+            pass
+
+        # ENHANCED POST METADATA EXTRACTION
+        try:
+            # Post type (suggested, promoted, etc.)
+            try:
+                header = post_element.find_element(By.CSS_SELECTOR, ".update-components-header__text-view")
+                header_text = header.text.strip()
+                if header_text:
+                    result["post_metadata"]["post_type"] = header_text.lower()
+            except:
+                pass
+                
+            # Edit status and visibility
+            try:
+                sub_description = post_element.find_element(By.CSS_SELECTOR, ".update-components-actor__sub-description")
+                sub_text = sub_description.text.strip()
+                result["post_metadata"]["is_edited"] = "Edited" in sub_text
+                
+                if "Visible to anyone" in sub_text:
+                    result["post_metadata"]["visibility"] = "public"
+                elif "connections" in sub_text.lower():
+                    result["post_metadata"]["visibility"] = "connections"
+                else:
+                    result["post_metadata"]["visibility"] = "unknown"
+            except:
+                pass
+                
+            # Text direction
+            try:
+                text_container = post_element.find_element(By.CSS_SELECTOR, ".update-components-text")
+                dir_attr = text_container.get_attribute('dir')
+                if dir_attr:
+                    result["post_metadata"]["text_direction"] = dir_attr
+            except:
+                pass
+                
+        except Exception:
+            pass
+
         # Extract hashtags from content
         if result["content"]:
             hashtag_pattern = r'#(\w+)'

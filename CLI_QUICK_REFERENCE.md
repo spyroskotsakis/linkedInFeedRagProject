@@ -58,13 +58,13 @@ python complete_linkedin_scraper.py --posts 5 --no-headless --verbose
 python complete_linkedin_scraper.py -n 10 --headless
 ```
 
-### Production Runs
+### Large Scale Runs
 ```bash
-# Large extraction with custom output
-python complete_linkedin_scraper.py --posts 100 --output "feed_$(date +%Y%m%d).json" --headless
+# Large extraction with enhanced fast script
+python complete_linkedin_scraper_enhanced_fast.py --posts 1000 --speed fast --headless
 
-# Conservative extraction with slower scrolling
-python complete_linkedin_scraper.py --posts 50 --scroll-delay 3 --headless
+# Balanced mode for reliability
+python complete_linkedin_scraper_enhanced_fast.py --posts 500 --speed balanced --headless
 ```
 
 ### Development/Debugging

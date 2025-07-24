@@ -137,21 +137,6 @@ python complete_linkedin_scraper.py --posts 100 --verbose
 python complete_linkedin_scraper.py --posts 100 --verbose  # Repeat 20 times for 2000 posts
 ```
 
-#### **⚡ Production Script (Advanced Users)**
-```bash
-# Production script with enterprise logging and recovery systems
-python linkedin_scraper_production.py --posts 2000 --headless
-
-# Interactive mode (asks for post count)
-python linkedin_scraper_production.py
-
-# Debug mode with visible browser (recommended for first-time setup)
-python linkedin_scraper_production.py --posts 50 --verbose
-
-# Custom batch processing
-python linkedin_scraper_production.py --posts 500 --batch-size 100 --headless
-```
-
 #### **🔧 Standard Script (Basic Operations)**
 ```bash
 # Interactive mode (asks for post count)
@@ -169,31 +154,7 @@ python complete_linkedin_scraper.py --posts 50 --headless
 
 #### **📋 Complete Command Line Options**
 
-**Production Script Options:**
-```bash
-python linkedin_scraper_production.py [OPTIONS]
-
-Required:
-  -n, --posts N         Number of posts to extract (recommended: 2000 for daily ops)
-
-Optional:
-  --headless           Run browser in headless mode (recommended for automation)
-  --verbose, -v        Enable verbose output with post previews and detailed logs
-  --batch-size N       Batch size for memory management (default: 100)
-  --help              Show help message and examples
-
-Examples:
-  # Daily automated run
-  python linkedin_scraper_production.py --posts 2000 --headless
-  
-  # Debug/setup run (visible browser for security challenges)
-  python linkedin_scraper_production.py --posts 25 --verbose
-  
-  # Large batch with custom processing
-  python linkedin_scraper_production.py --posts 1000 --batch-size 200 --headless
-```
-
-**Standard Script Options:**
+**Script Options:**
 ```bash
 python complete_linkedin_scraper.py [OPTIONS]
 
@@ -254,7 +215,7 @@ LinkedIn may present security challenges (captchas) during login. Here's how to 
 **For Interactive Setup (Recommended for First Run):**
 ```bash
 # Run in visible mode to manually complete security challenges
-python linkedin_scraper_production.py --posts 50 --verbose
+python complete_linkedin_scraper_enhanced_fast.py --posts 50 --verbose --speed balanced
 # OR
 python complete_linkedin_scraper.py --posts 10 --verbose
 
@@ -267,7 +228,7 @@ python complete_linkedin_scraper.py --posts 10 --verbose
 **For Automated Production Runs:**
 ```bash
 # Use headless mode after initial setup
-python linkedin_scraper_production.py --posts 2000 --headless
+python complete_linkedin_scraper_enhanced_fast.py --posts 2000 --headless --speed fast
 
 # Note: If security challenges occur during automated runs,
 # the system will log the issue and gracefully exit.
@@ -307,7 +268,7 @@ The **Enhanced LinkedIn Scraper** (`complete_linkedin_scraper_enhanced.py`) is s
 3. **Real-time Resource Monitoring** - Tracks memory, CPU usage, and performance
 4. **Comprehensive Error Recovery** - Automatic retry with exponential backoff
 5. **Enhanced Anti-Detection** - Advanced stealth measures and human-like behavior
-6. **Production Logging** - Detailed logs with performance metrics and debugging info
+6. **Smart Logging** - Detailed logs with performance metrics and debugging info
 
 #### **📊 When to Use Each Version:**
 
@@ -433,9 +394,6 @@ The scraper uses **proven working selectors** identified through extensive diagn
 linkedInFeedRagProject/
 ├── complete_linkedin_scraper_enhanced_fast.py # 🏃 Enhanced scraper (🌟 PRIMARY - 99%+ success, speed-optimized)
 ├── complete_linkedin_scraper.py               # 🎯 Standard scraper (limited to 100 posts)
-├── linkedin_scraper_production.py             # ⚡ Advanced production script
-├── production_logger.py                 # 📊 Production logging and error categorization
-├── production_recovery.py               # 🔄 Automatic retry and recovery mechanisms
 ├── setup_credentials.py                 # 🔐 Credential management
 ├── simple_linkedin_test.py              # 🧪 Quick connectivity test
 ├── verify_env.py                        # ✅ Environment validation
@@ -448,7 +406,7 @@ linkedInFeedRagProject/
 ├── tests/                               # 🧪 Unit and integration tests
 ├── src/linkedin_feed_capture/           # 📚 Modular library components
 ├── documents/                           # 📖 Selenium documentation
-├── logs/                                # 📝 Application logs (production logging)
+├── logs/                                # 📝 Application logs
 └── docker/                              # 🐳 Docker configuration
 ```
 
@@ -471,12 +429,6 @@ linkedInFeedRagProject/
 - **Comprehensive analytics** and multiple output formats
 - **Requires manual chunking** for larger operations
 - **Use only for:** Small extractions, learning, testing
-
-#### **⚡ linkedin_scraper_production.py** - Advanced Production Script
-- **Enterprise-level logging** with categorized error tracking
-- **Advanced recovery mechanisms** with circuit breaker patterns
-- **Production monitoring** with performance metrics and alerting
-- **Session persistence** and automatic recovery systems
 
 #### **🔐 setup_credentials.py** - Credential Management
 - Secure credential storage with encryption

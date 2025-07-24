@@ -224,12 +224,35 @@ def extract_post_data_fast(post_element, post_number):
     post_data = {
         "urn": "",
         "author": "",
+        "author_metadata": {
+            "profile_url": "",
+            "profile_id": "", 
+            "avatar_url": "",
+            "is_verified": False,
+            "is_premium": False,
+            "connection_status": "",
+            "is_following": False,
+            "connection_degree": "",
+            "job_title": ""
+        },
         "content": "",
-        "engagement": {"likes": 0, "comments": 0, "shares": 0},
+        "engagement": {
+            "likes": 0, 
+            "comments": 0, 
+            "shares": 0,
+            "reaction_types": [],
+            "total_reactions": 0
+        },
         "timestamp": "",
         "media": [],
         "hashtags": [],
-        "url": ""
+        "url": "",
+        "post_metadata": {
+            "visibility": "",
+            "is_edited": False,
+            "text_direction": "ltr",
+            "post_type": ""
+        }
     }
     
     try:
@@ -317,6 +340,138 @@ def extract_post_data_fast(post_element, post_number):
                     except Exception:
                         continue
         
+        # ENHANCED URL GENERATION from URN (100% reliable)
+        if not post_data["url"] and post_data["urn"]:
+            try:
+                urn_id = post_data["urn"].replace("urn:li:activity:", "")
+                post_data["url"] = f"https://www.linkedin.com/feed/update/urn:li:activity:{urn_id}/"
+            except Exception:
+                pass
+
+        # ENHANCED AUTHOR METADATA EXTRACTION
+        try:
+            # Find author container
+            actor_container = post_element.find_element(By.CSS_SELECTOR, ".update-components-actor__container")
+            
+            # Profile URL and ID
+            profile_link = actor_container.find_element(By.CSS_SELECTOR, "a[href*='/in/']")
+            if profile_link:
+                href = profile_link.get_attribute('href')
+                post_data["author_metadata"]["profile_url"] = href
+                
+                # Extract profile ID from URL
+                import re
+                profile_match = re.search(r'/in/([^/?]+)', href)
+                if profile_match:
+                    post_data["author_metadata"]["profile_id"] = profile_match.group(1)
+                    
+            # Avatar URL
+            avatar_img = actor_container.find_element(By.CSS_SELECTOR, "img")
+            if avatar_img:
+                post_data["author_metadata"]["avatar_url"] = avatar_img.get_attribute('src')
+                
+            # Verification status
+            try:
+                actor_container.find_element(By.CSS_SELECTOR, "svg[data-test-icon='verified-small']")
+                post_data["author_metadata"]["is_verified"] = True
+            except:
+                pass
+                
+            # Premium status  
+            try:
+                actor_container.find_element(By.CSS_SELECTOR, "svg[class*='premium']")
+                post_data["author_metadata"]["is_premium"] = True
+            except:
+                pass
+                
+            # Connection status
+            try:
+                connection_elem = actor_container.find_element(By.CSS_SELECTOR, ".update-components-actor__supplementary-actor-info")
+                connection_text = connection_elem.text.strip()
+                post_data["author_metadata"]["connection_status"] = connection_text
+                post_data["author_metadata"]["is_following"] = "Following" in connection_text
+                
+                if "1st" in connection_text:
+                    post_data["author_metadata"]["connection_degree"] = "1st"
+                elif "2nd" in connection_text:
+                    post_data["author_metadata"]["connection_degree"] = "2nd"
+                elif "3rd" in connection_text:
+                    post_data["author_metadata"]["connection_degree"] = "3rd"
+            except:
+                pass
+                
+            # Job title
+            try:
+                description_elem = actor_container.find_element(By.CSS_SELECTOR, ".update-components-actor__description")
+                post_data["author_metadata"]["job_title"] = description_elem.text.strip()
+            except:
+                pass
+                
+        except Exception:
+            pass
+
+        # ENHANCED ENGAGEMENT EXTRACTION
+        try:
+            # Reaction types from icons
+            reaction_icons = post_element.find_elements(By.CSS_SELECTOR, "img[data-test-reactions-icon-type]")
+            reaction_types = []
+            for icon in reaction_icons:
+                reaction_type = icon.get_attribute('data-test-reactions-icon-type')
+                if reaction_type:
+                    reaction_types.append(reaction_type.lower())
+            post_data["engagement"]["reaction_types"] = list(set(reaction_types))
+            
+            # Total reactions (improved)
+            try:
+                reaction_elem = post_element.find_element(By.CSS_SELECTOR, ".social-details-social-counts__reactions-count")
+                count_text = reaction_elem.text.strip()
+                if count_text and any(char.isdigit() for char in count_text):
+                    total_reactions = parse_count(count_text)
+                    post_data["engagement"]["likes"] = total_reactions
+                    post_data["engagement"]["total_reactions"] = total_reactions
+            except:
+                pass
+        except Exception:
+            pass
+
+        # ENHANCED POST METADATA EXTRACTION
+        try:
+            # Post type (suggested, promoted, etc.)
+            try:
+                header = post_element.find_element(By.CSS_SELECTOR, ".update-components-header__text-view")
+                header_text = header.text.strip()
+                if header_text:
+                    post_data["post_metadata"]["post_type"] = header_text.lower()
+            except:
+                pass
+                
+            # Edit status and visibility
+            try:
+                sub_description = post_element.find_element(By.CSS_SELECTOR, ".update-components-actor__sub-description")
+                sub_text = sub_description.text.strip()
+                post_data["post_metadata"]["is_edited"] = "Edited" in sub_text
+                
+                if "Visible to anyone" in sub_text:
+                    post_data["post_metadata"]["visibility"] = "public"
+                elif "connections" in sub_text.lower():
+                    post_data["post_metadata"]["visibility"] = "connections"
+                else:
+                    post_data["post_metadata"]["visibility"] = "unknown"
+            except:
+                pass
+                
+            # Text direction
+            try:
+                text_container = post_element.find_element(By.CSS_SELECTOR, ".update-components-text")
+                dir_attr = text_container.get_attribute('dir')
+                if dir_attr:
+                    post_data["post_metadata"]["text_direction"] = dir_attr
+            except:
+                pass
+                
+        except Exception:
+            pass
+
         # Speed-optimized hashtag extraction
         if speed_config.enhanced_validation:
             try:

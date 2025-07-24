@@ -68,7 +68,7 @@ Through comprehensive diagnostic analysis, we identified that:
 - `diagnostic_scraper_automated.py` 
 - `diagnostic_scraper.py`
 - `complete_linkedin_scraper_v2.py`
-- `production_scraper.py`
+
 - `playwright_scraper.py`
 - `network_interceptor.py`
 - `comprehensive_test_suite.py`
