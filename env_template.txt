@@ -1,0 +1,26 @@
+# LinkedIn Feed Capture Configuration
+# Copy this content to .env and fill in your LinkedIn credentials
+
+# LinkedIn Authentication (Required)
+LINKEDIN_EMAIL=your.email@example.com
+LINKEDIN_PASSWORD=your_password_here
+
+# Optional Configuration
+COOKIE_PATH=./data/cookies.pkl
+COOKIE_ENCRYPTION_KEY=your_encryption_key_here
+
+# Scraping Configuration
+MAX_POSTS=50
+SCROLL_DELAY_MS=2000
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=./logs/linkedin_scraper.log
+
+# Browser Configuration
+HEADLESS=true
+STEALTH_MODE=true
+
+# Output Configuration
+OUTPUT_FORMAT=json
+PRETTY_PRINT=true 
