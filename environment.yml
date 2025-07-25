@@ -40,6 +40,12 @@ dependencies:
   - pandas>=2.0.0
   - numpy>=1.24.0
   
+  # UI and RAG Dependencies
+  - streamlit>=1.29.0
+  - polars>=0.20.0
+  - plotly>=5.17.0
+  - altair>=5.0.0
+  
   # Pip dependencies (packages not available in conda or need specific versions)
   - pip
   - pip:
@@ -51,4 +57,18 @@ dependencies:
     - pytest-benchmark==4.0.0
     - memray==1.10.0
     - bandit==1.7.5
-    - safety==2.3.5 
+    - safety==2.3.5
+    # UI Components
+    - streamlit-aggrid==0.3.4
+    - streamlit-option-menu==0.3.6
+    # RAG Dependencies
+    - langchain>=0.1.0
+    - langchain-openai>=0.0.5
+    - langchain-community>=0.0.13
+    - langgraph>=0.0.20
+    - chromadb>=0.4.20
+    - sentence-transformers>=2.2.2
+    - ollama>=0.1.7
+    - openai>=1.6.0
+    # Testing utilities
+    - httpx>=0.24.0
