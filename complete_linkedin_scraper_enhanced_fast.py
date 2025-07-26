@@ -570,7 +570,7 @@ def setup_fast_driver(headless=True):
         print(f"❌ Failed to setup speed-optimized driver: {e}")
         raise
 
-def restart_browser_session_fast(driver, email, password):
+def restart_browser_session_fast(driver, email, password, headless=False):
     """Speed-optimized browser session restart"""
     try:
         if speed_config.verbose_logging:
@@ -588,8 +588,8 @@ def restart_browser_session_fast(driver, email, password):
         gc.collect()
         time.sleep(cleanup_delay)
         
-        # Create new fast driver
-        new_driver = setup_fast_driver(headless=True)
+        # Create new fast driver with same headless setting as original
+        new_driver = setup_fast_driver(headless=headless)
         
         # Re-authenticate
         login_success = login_to_linkedin_fast(new_driver, email, password)
@@ -680,7 +680,7 @@ def login_to_linkedin_fast(driver, email, password):
         print(f"❌ Login failed: {e}")
         return False
 
-def scroll_and_extract_posts_fast(driver, target_posts=10, verbose=False, email=None, password=None):
+def scroll_and_extract_posts_fast(driver, target_posts=10, verbose=False, email=None, password=None, headless=False):
     """
     Speed-optimized scrolling and extraction with configurable performance.
     """
@@ -720,7 +720,8 @@ def scroll_and_extract_posts_fast(driver, target_posts=10, verbose=False, email=
                     logger.info(f"Initiating scheduled session restart at {len(extracted_posts)} posts")
                 print(f"🔄 Scheduled session restart at {len(extracted_posts)} posts...")
                 
-                driver = restart_browser_session_fast(driver, email, password)
+                # Use the same headless setting as the original session
+                driver = restart_browser_session_fast(driver, email, password, headless=headless)
                 time.sleep(2)  # Reduced post-restart wait
                 
             except Exception as e:
@@ -809,7 +810,8 @@ def scroll_and_extract_posts_fast(driver, target_posts=10, verbose=False, email=
             print(f"❌ Browser session lost, attempting recovery...")
             
             try:
-                driver = restart_browser_session_fast(driver, email, password)
+                # Use the same headless setting as the original session
+                driver = restart_browser_session_fast(driver, email, password, headless=headless)
                 log_extraction_stat("session_recoveries")
                 print("✅ Session recovered!")
                 continue
@@ -1017,7 +1019,8 @@ def main():
             target_posts=post_count, 
             verbose=args.verbose,
             email=email,
-            password=password
+            password=password,
+            headless=args.headless
         )
         
         end_time = time.time()
