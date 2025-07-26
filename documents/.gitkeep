@@ -1,9 +1,0 @@
-# This file ensures the documents/ folder is tracked by git
-# while the contents are ignored per .gitignore rules
-# 
-# The documents/ folder serves as a knowledge base for:
-# - Selenium documentation and best practices
-# - WebDriver configuration guides  
-# - Browser automation strategies
-# - Anti-detection techniques
-# - Error handling and troubleshooting guides 

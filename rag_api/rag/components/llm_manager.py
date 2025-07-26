@@ -50,6 +50,9 @@ class LLMManager:
         """Initialize the LLM manager."""
         try:
             logger.info(f"Initializing LLM manager with provider: {self.provider}")
+            logger.info(f"Model: {self.model}")
+            logger.info(f"Temperature: {self.temperature}")
+            logger.info(f"Max tokens: {self.max_tokens}")
             
             if self.provider == "ollama":
                 self.base_url = await get_working_ollama_url()
@@ -76,19 +79,44 @@ class LLMManager:
         
         try:
             if self.provider == "ollama":
-                # Prepare the full prompt with context
+                # Prepare the full prompt with strict instructions using standard format
                 if context:
-                    full_prompt = f"""Based on the following documents, please answer this question: {prompt}
+                    full_prompt = f"""You are a strict document analysis assistant. You must follow these rules:
 
-Context:
+🚫 CRITICAL INSTRUCTIONS:
+- ONLY answer based on the provided documents below
+- If the answer is NOT in the documents, respond exactly: "I cannot find this information in the provided documents"
+- Always cite document numbers when referencing information (e.g., "According to Document 1...")
+- NEVER use your general knowledge or training data
+- ✅ REQUIRED: Base your response ONLY on the documents provided
+- 📝 Include specific quotes from documents when possible
+
+DOCUMENTS:
 {context}
 
-Please provide a helpful and specific answer based on the information in the context."""
+QUESTION: {prompt}
+
+RESPONSE (based strictly on the documents above):"""
                 else:
-                    full_prompt = prompt
+                    full_prompt = f"""You are a strict document analysis assistant.
+
+No documents were provided for analysis.
+
+QUESTION: {prompt}
+
+RESPONSE: I cannot answer this question as no relevant documents have been provided for analysis."""
                 
                 logger.info(f"Calling Ollama with model: {self.model}")
                 logger.info(f"Full prompt length: {len(full_prompt)} characters")
+                
+                # Log the complete prompt for verification
+                logger.info("=" * 80)
+                logger.info("COMPLETE PROMPT BEING SENT TO LLM:")
+                logger.info("=" * 80)
+                logger.info(full_prompt)
+                logger.info("=" * 80)
+                logger.info("END OF PROMPT")
+                logger.info("=" * 80)
                 
                 payload = {
                     "model": self.model,
@@ -96,9 +124,26 @@ Please provide a helpful and specific answer based on the information in the con
                     "stream": False,
                     "options": {
                         "temperature": self.temperature,
-                        "num_predict": self.max_tokens
+                        "num_predict": self.max_tokens,
+                        "top_k": 10,
+                        "top_p": 0.1,
+                        "repeat_penalty": 1.2,
+                        "system": "You are a strict document-only assistant. NEVER use general knowledge. ONLY use the provided documents. If information is not in the documents, say 'I cannot find this information in the provided documents'."
                     }
                 }
+                
+                # Log the complete payload for verification
+                logger.info("COMPLETE PAYLOAD BEING SENT TO OLLAMA:")
+                logger.info("=" * 60)
+                import json
+                logger.info(json.dumps({
+                    "model": payload["model"],
+                    "prompt_length": len(payload["prompt"]),
+                    "stream": payload["stream"],
+                    "options": payload["options"]
+                }, indent=2))
+                logger.info("=" * 60)
+                
                 async with aiohttp.ClientSession() as client:
                     async with client.post(f"{self.base_url}/api/generate", json=payload, timeout=30) as response:
                         if response.status != 200:

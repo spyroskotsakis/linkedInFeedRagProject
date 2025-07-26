@@ -30,9 +30,9 @@ class VectorStoreConfig:
 class LLMConfig:
     """Configuration for LLM providers."""
     provider: str = "ollama"  # "ollama" or "azure"
-    model: str = "mistral-nemo:12b"
+    model: str = "llama3.1:8b"
     temperature: float = 0.1
-    max_tokens: int = 2048
+    max_tokens: int = 70000
     base_url: Optional[str] = None
     api_key: Optional[str] = None
     deployment: Optional[str] = None

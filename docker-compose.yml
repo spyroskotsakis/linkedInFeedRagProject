@@ -13,9 +13,9 @@ services:
       - RAG_EMBEDDING_MODEL=all-MiniLM-L6-v2
       - RAG_VECTOR_STORE_PATH=/app/vector_store
       - RAG_LLM_PROVIDER=ollama
-      - RAG_LLM_MODEL=mistral-nemo:12b
+      - RAG_LLM_MODEL=llama3.1:8b
       - RAG_LLM_TEMPERATURE=0.1
-      - RAG_LLM_MAX_TOKENS=2048
+      - RAG_LLM_MAX_TOKENS=70000
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT:-}
       - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}

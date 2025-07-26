@@ -109,7 +109,7 @@ class Retriever:
                 context_parts = [self.build_context(doc, i+1) for i, doc in enumerate(filtered_docs)]
                 context = "\n\n".join(context_parts)
                 answer = await self.llm_manager.generate_response(
-                    prompt=f"Based on the following documents, please answer this question: {query}",
+                    prompt=query,
                     context=context
                 )
                 logger.info("LLM manager generate_response completed successfully")
