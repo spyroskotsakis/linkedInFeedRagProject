@@ -163,9 +163,9 @@ $RECYCLE.BIN/
 *~
 
 # Documents folder - ignore all contents but keep folder structure
-documents/*
-documents/*/
-!documents/.gitkeep
+# documents/*
+# documents/*/
+# !documents/.gitkeep
 
 # Browser and scraping related
 cookies.pkl

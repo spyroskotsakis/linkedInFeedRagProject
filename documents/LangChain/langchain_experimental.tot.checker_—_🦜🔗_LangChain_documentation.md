@@ -1,0 +1,11 @@
+# langchain_experimental.tot.checker — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_experimental/tot/checker.html
+**Word Count:** 55
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:19:27
+**Status:** completed
+
+---
+
+# Source code for langchain\_experimental.tot.checker               from abc import ABC, abstractmethod     from typing import Any, Dict, List, Optional, Tuple          from langchain.chains.base import Chain     from langchain_core.callbacks.manager import CallbackManagerForChainRun          from langchain_experimental.tot.thought import ThoughtValidity                              [[docs]](https://python.langchain.com/api_reference/experimental/tot/langchain_experimental.tot.checker.ToTChecker.html#langchain_experimental.tot.checker.ToTChecker)     class ToTChecker(Chain, ABC):         """         Tree of Thought (ToT) checker.              This is an abstract ToT checker that must be implemented by the user. You         can implement a simple rule-based checker or a more sophisticated         neural network based classifier.         """              output_key: str = "validity"  #: :meta private:              @property         def input_keys(self) -> List[str]:             """The checker input keys.                  :meta private:             """             return ["problem_description", "thoughts"]              @property         def output_keys(self) -> List[str]:             """The checker output keys.                  :meta private:             """             return [self.output_key]                         [[docs]](https://python.langchain.com/api_reference/experimental/tot/langchain_experimental.tot.checker.ToTChecker.html#langchain_experimental.tot.checker.ToTChecker.evaluate)         @abstractmethod         def evaluate(             self,             problem_description: str,             thoughts: Tuple[str, ...] = (),         ) -> ThoughtValidity:             """             Evaluate the response to the problem description and return the solution type.             """                             def _call(             self,             inputs: Dict[str, Any],             run_manager: Optional[CallbackManagerForChainRun] = None,         ) -> Dict[str, ThoughtValidity]:             return {self.output_key: self.evaluate(**inputs)}

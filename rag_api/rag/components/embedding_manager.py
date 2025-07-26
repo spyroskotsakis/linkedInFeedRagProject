@@ -86,6 +86,18 @@ class EmbeddingManager:
         
         return collection
     
+    def build_full_text(self, doc):
+        meta = doc.get("metadata", {})
+        return (
+            f"Author: {meta.get('author', '')}\n"
+            f"Content: {doc.get('content', '')}\n"
+            f"Likes: {meta.get('likes', 0)}\n"
+            f"Comments: {meta.get('comments', 0)}\n"
+            f"Shares: {meta.get('shares', 0)}\n"
+            f"Timestamp: {meta.get('timestamp', '')}\n"
+            f"URL: {meta.get('url', '')}"
+        )
+
     async def add_documents(self, collection_name: str, documents: List[Dict[str, Any]]):
         """Add documents to the vector store."""
         if not self._initialized:
@@ -95,7 +107,7 @@ class EmbeddingManager:
             collection = self.get_collection(collection_name)
             
             # Prepare data for ChromaDB
-            texts = [doc.get("content", "") for doc in documents]
+            texts = [self.build_full_text(doc) for doc in documents]
             metadatas = [doc.get("metadata", {}) for doc in documents]
             ids = [doc.get("id", f"doc_{i}") for i, doc in enumerate(documents)]
             

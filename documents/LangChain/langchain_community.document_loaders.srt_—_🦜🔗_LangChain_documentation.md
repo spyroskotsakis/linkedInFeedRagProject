@@ -1,0 +1,11 @@
+# langchain_community.document_loaders.srt — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/document_loaders/srt.html
+**Word Count:** 27
+**Links Count:** 15
+**Scraped:** 2025-07-21 09:14:31
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.document\_loaders.srt               from pathlib import Path     from typing import List, Union          from langchain_core.documents import Document          from langchain_community.document_loaders.base import BaseLoader                              [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.srt.SRTLoader.html#langchain_community.document_loaders.srt.SRTLoader)     class SRTLoader(BaseLoader):         """Load `.srt` (subtitle) files."""                         [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.srt.SRTLoader.html#langchain_community.document_loaders.srt.SRTLoader.__init__)         def __init__(self, file_path: Union[str, Path]):             """Initialize with a file path."""             try:                 import pysrt  # noqa:F401             except ImportError:                 raise ImportError(                     "package `pysrt` not found, please install it with `pip install pysrt`"                 )             self.file_path = str(file_path)                                        [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.srt.SRTLoader.html#langchain_community.document_loaders.srt.SRTLoader.load)         def load(self) -> List[Document]:             """Load using pysrt file."""             import pysrt                  parsed_info = pysrt.open(self.file_path)             text = " ".join([t.text for t in parsed_info])             metadata = {"source": self.file_path}             return [Document(page_content=text, metadata=metadata)]

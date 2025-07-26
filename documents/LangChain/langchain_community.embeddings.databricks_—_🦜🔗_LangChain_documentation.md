@@ -1,0 +1,11 @@
+# langchain_community.embeddings.databricks — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/embeddings/databricks.html
+**Word Count:** 44
+**Links Count:** 13
+**Scraped:** 2025-07-21 09:14:31
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.embeddings.databricks               from __future__ import annotations          from typing import Iterator, List     from urllib.parse import urlparse          from langchain_core._api import deprecated          from langchain_community.embeddings.mlflow import MlflowEmbeddings               def _chunk(texts: List[str], size: int) -> Iterator[List[str]]:         for i in range(0, len(texts), size):             yield texts[i : i + size]                              [[docs]](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.databricks.DatabricksEmbeddings.html#langchain_community.embeddings.databricks.DatabricksEmbeddings)     @deprecated(         since="0.3.3",         removal="1.0",         alternative_import="databricks_langchain.DatabricksEmbeddings",     )     class DatabricksEmbeddings(MlflowEmbeddings):         """Databricks embeddings.              To use, you should have the ``mlflow`` python package installed.         For more information, see https://mlflow.org/docs/latest/llms/deployments.              Example:             .. code-block:: python                      from langchain_community.embeddings import DatabricksEmbeddings                      embeddings = DatabricksEmbeddings(                     target_uri="databricks",                     endpoint="embeddings",                 )         """              target_uri: str = "databricks"         """The target URI to use. Defaults to ``databricks``."""              @property         def _mlflow_extras(self) -> str:             return ""              def _validate_uri(self) -> None:             if self.target_uri == "databricks":                 return                  if urlparse(self.target_uri).scheme != "databricks":                 raise ValueError(                     "Invalid target URI. The target URI must be a valid databricks URI."                 )

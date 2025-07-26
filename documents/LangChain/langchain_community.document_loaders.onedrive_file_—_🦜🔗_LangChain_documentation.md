@@ -1,0 +1,11 @@
+# langchain_community.document_loaders.onedrive_file — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/document_loaders/onedrive_file.html
+**Word Count:** 14
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:13:00
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.document\_loaders.onedrive\_file               from __future__ import annotations          import tempfile     from typing import TYPE_CHECKING, List          from langchain_core.documents import Document     from pydantic import BaseModel, ConfigDict, Field          from langchain_community.document_loaders.base import BaseLoader     from langchain_community.document_loaders.unstructured import UnstructuredFileLoader          if TYPE_CHECKING:         from O365.drive import File          CHUNK_SIZE = 1024 * 1024 * 5                              [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.onedrive_file.OneDriveFileLoader.html#langchain_community.document_loaders.onedrive_file.OneDriveFileLoader)     class OneDriveFileLoader(BaseLoader, BaseModel):         """Load a file from `Microsoft OneDrive`."""              file: File = Field(...)         """The file to load."""              model_config = ConfigDict(             arbitrary_types_allowed=True,         )                         [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.onedrive_file.OneDriveFileLoader.html#langchain_community.document_loaders.onedrive_file.OneDriveFileLoader.load)         def load(self) -> List[Document]:             """Load Documents"""             with tempfile.TemporaryDirectory() as temp_dir:                 file_path = f"{temp_dir}/{self.file.name}"                 self.file.download(to_path=temp_dir, chunk_size=CHUNK_SIZE)                 loader = UnstructuredFileLoader(file_path)                 return loader.load()

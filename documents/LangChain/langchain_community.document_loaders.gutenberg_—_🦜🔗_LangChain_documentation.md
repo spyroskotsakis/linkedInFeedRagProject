@@ -1,0 +1,11 @@
+# langchain_community.document_loaders.gutenberg — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/document_loaders/gutenberg.html
+**Word Count:** 22
+**Links Count:** 15
+**Scraped:** 2025-07-21 09:12:16
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.document\_loaders.gutenberg               from typing import List          from langchain_core.documents import Document          from langchain_community.document_loaders.base import BaseLoader                              [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.gutenberg.GutenbergLoader.html#langchain_community.document_loaders.gutenberg.GutenbergLoader)     class GutenbergLoader(BaseLoader):         """Load from `Gutenberg.org`."""                         [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.gutenberg.GutenbergLoader.html#langchain_community.document_loaders.gutenberg.GutenbergLoader.__init__)         def __init__(self, file_path: str):             """Initialize with a file path."""             if not file_path.startswith("https://www.gutenberg.org"):                 raise ValueError("file path must start with 'https://www.gutenberg.org'")                  if not file_path.endswith(".txt"):                 raise ValueError("file path must end with '.txt'")                  self.file_path = file_path                                        [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.gutenberg.GutenbergLoader.html#langchain_community.document_loaders.gutenberg.GutenbergLoader.load)         def load(self) -> List[Document]:             """Load file."""             from urllib.request import urlopen                  elements = urlopen(self.file_path)             text = "\n\n".join([str(el.decode("utf-8-sig")) for el in elements])             metadata = {"source": self.file_path}             return [Document(page_content=text, metadata=metadata)]

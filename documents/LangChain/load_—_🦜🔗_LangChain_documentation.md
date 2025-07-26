@@ -1,0 +1,19 @@
+# load — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/core/load.html
+**Word Count:** 66
+**Links Count:** 120
+**Scraped:** 2025-07-21 07:55:55
+**Status:** completed
+
+---
+
+# `load`\#
+
+**Load** module helps with serialization and deserialization.
+
+**Classes**
+
+[`load.load.Reviver`](https://python.langchain.com/api_reference/core/load/langchain_core.load.load.Reviver.html#langchain_core.load.load.Reviver "langchain_core.load.load.Reviver")\(\[secrets\_map, ...\]\) | Reviver for JSON objects.   ---|---   [`load.serializable.BaseSerialized`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.BaseSerialized.html#langchain_core.load.serializable.BaseSerialized "langchain_core.load.serializable.BaseSerialized") | Base class for serialized objects.   [`load.serializable.Serializable`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.Serializable.html#langchain_core.load.serializable.Serializable "langchain_core.load.serializable.Serializable") | Serializable base class.   [`load.serializable.SerializedConstructor`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.SerializedConstructor.html#langchain_core.load.serializable.SerializedConstructor "langchain_core.load.serializable.SerializedConstructor") | Serialized constructor.   [`load.serializable.SerializedNotImplemented`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.SerializedNotImplemented.html#langchain_core.load.serializable.SerializedNotImplemented "langchain_core.load.serializable.SerializedNotImplemented") | Serialized not implemented.   [`load.serializable.SerializedSecret`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.SerializedSecret.html#langchain_core.load.serializable.SerializedSecret "langchain_core.load.serializable.SerializedSecret") | Serialized secret.      **Functions**
+
+[`load.dump.default`](https://python.langchain.com/api_reference/core/load/langchain_core.load.dump.default.html#langchain_core.load.dump.default "langchain_core.load.dump.default")\(obj\) | Return a default value for an object.   ---|---   [`load.dump.dumpd`](https://python.langchain.com/api_reference/core/load/langchain_core.load.dump.dumpd.html#langchain_core.load.dump.dumpd "langchain_core.load.dump.dumpd")\(obj\) | Return a dict representation of an object.   [`load.dump.dumps`](https://python.langchain.com/api_reference/core/load/langchain_core.load.dump.dumps.html#langchain_core.load.dump.dumps "langchain_core.load.dump.dumps")\(obj, \*\[, pretty\]\) | Return a json string representation of an object.   [`load.load.load`](https://python.langchain.com/api_reference/core/load/langchain_core.load.load.load.html#langchain_core.load.load.load "langchain_core.load.load.load")\(obj, \*\[, secrets\_map, ...\]\) |    [`load.load.loads`](https://python.langchain.com/api_reference/core/load/langchain_core.load.load.loads.html#langchain_core.load.load.loads "langchain_core.load.load.loads")\(text, \*\[, secrets\_map, ...\]\) |    [`load.serializable.to_json_not_implemented`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.to_json_not_implemented.html#langchain_core.load.serializable.to_json_not_implemented "langchain_core.load.serializable.to_json_not_implemented")\(obj\) | Serialize a "not implemented" object.   [`load.serializable.try_neq_default`](https://python.langchain.com/api_reference/core/load/langchain_core.load.serializable.try_neq_default.html#langchain_core.load.serializable.try_neq_default "langchain_core.load.serializable.try_neq_default")\(value, ...\) | Try to determine if a value is different from the default.

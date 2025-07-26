@@ -10,4 +10,5 @@ ollama
 polars
 python-multipart
 httpx
+aiohttp
 python-dotenv 

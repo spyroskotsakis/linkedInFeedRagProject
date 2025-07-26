@@ -1,0 +1,11 @@
+# langchain_community.tools.google_places.tool — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/google_places/tool.html
+**Word Count:** 46
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:13:22
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.google\_places.tool               """Tool for the Google search API."""          from typing import Optional, Type          from langchain_core._api.deprecation import deprecated     from langchain_core.callbacks import CallbackManagerForToolRun     from langchain_core.tools import BaseTool     from pydantic import BaseModel, Field          from langchain_community.utilities.google_places_api import GooglePlacesAPIWrapper                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.google_places.tool.GooglePlacesSchema.html#langchain_community.tools.google_places.tool.GooglePlacesSchema)     class GooglePlacesSchema(BaseModel):         """Input for GooglePlacesTool."""              query: str = Field(..., description="Query for google maps")                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.google_places.tool.GooglePlacesTool.html#langchain_community.tools.google_places.tool.GooglePlacesTool)     @deprecated(         since="0.0.33",         removal="1.0",         alternative_import="langchain_google_community.GooglePlacesTool",     )     class GooglePlacesTool(BaseTool):         """Tool that queries the Google places API."""              name: str = "google_places"         description: str = (             "A wrapper around Google Places. "             "Useful for when you need to validate or "             "discover addressed from ambiguous text. "             "Input should be a search query."         )         api_wrapper: GooglePlacesAPIWrapper = Field(default_factory=GooglePlacesAPIWrapper)         args_schema: Type[BaseModel] = GooglePlacesSchema              def _run(             self,             query: str,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> str:             """Use the tool."""             return self.api_wrapper.run(query)

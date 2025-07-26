@@ -1,0 +1,11 @@
+# langchain_community.tools.sleep.tool — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/sleep/tool.html
+**Word Count:** 40
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:13:00
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.sleep.tool               """Tool for agent to sleep."""          from asyncio import sleep as asleep     from time import sleep     from typing import Optional, Type          from langchain_core.callbacks import (         AsyncCallbackManagerForToolRun,         CallbackManagerForToolRun,     )     from langchain_core.tools import BaseTool     from pydantic import BaseModel, Field                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.sleep.tool.SleepInput.html#langchain_community.tools.sleep.tool.SleepInput)     class SleepInput(BaseModel):         """Input for CopyFileTool."""              sleep_time: int = Field(..., description="Time to sleep in seconds")                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.sleep.tool.SleepTool.html#langchain_community.tools.sleep.tool.SleepTool)     class SleepTool(BaseTool):         """Tool that adds the capability to sleep."""              name: str = "sleep"         args_schema: Type[BaseModel] = SleepInput         description: str = "Make agent sleep for a specified number of seconds."              def _run(             self,             sleep_time: int,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> str:             """Use the Sleep tool."""             sleep(sleep_time)             return f"Agent slept for {sleep_time} seconds."              async def _arun(             self,             sleep_time: int,             run_manager: Optional[AsyncCallbackManagerForToolRun] = None,         ) -> str:             """Use the sleep tool asynchronously."""             await asleep(sleep_time)             return f"Agent slept for {sleep_time} seconds."

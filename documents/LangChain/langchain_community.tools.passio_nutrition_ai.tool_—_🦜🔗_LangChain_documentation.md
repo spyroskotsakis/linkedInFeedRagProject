@@ -1,0 +1,11 @@
+# langchain_community.tools.passio_nutrition_ai.tool — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/passio_nutrition_ai/tool.html
+**Word Count:** 56
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:13:00
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.passio\_nutrition\_ai.tool               """Tool for the Passio Nutrition AI API."""          from typing import Dict, Optional, Type          from langchain_core.callbacks import CallbackManagerForToolRun     from langchain_core.tools import BaseTool     from pydantic import BaseModel, Field          from langchain_community.utilities.passio_nutrition_ai import NutritionAIAPI                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.passio_nutrition_ai.tool.NutritionAIInputs.html#langchain_community.tools.passio_nutrition_ai.tool.NutritionAIInputs)     class NutritionAIInputs(BaseModel):         """Inputs to the Passio Nutrition AI tool."""              query: str = Field(             description="A query to look up using Passio Nutrition AI, usually a few words."         )                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.passio_nutrition_ai.tool.NutritionAI.html#langchain_community.tools.passio_nutrition_ai.tool.NutritionAI)     class NutritionAI(BaseTool):         """Tool that queries the Passio Nutrition AI API."""              name: str = "nutritionai_advanced_search"         description: str = (             "A wrapper around the Passio Nutrition AI. "             "Useful to retrieve nutrition facts. "             "Input should be a search query string."         )         api_wrapper: NutritionAIAPI         args_schema: Type[BaseModel] = NutritionAIInputs              def _run(             self,             query: str,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> Optional[Dict]:             """Use the tool."""             return self.api_wrapper.run(query)

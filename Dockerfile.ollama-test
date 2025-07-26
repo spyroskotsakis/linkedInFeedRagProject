@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy test scripts
+COPY test_ollama_connectivity.py .
+COPY test_ollama_unit.py .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir httpx
+
+# Make scripts executable
+RUN chmod +x test_ollama_connectivity.py test_ollama_unit.py
+
+# Set default command
+CMD ["python", "test_ollama_connectivity.py"] 

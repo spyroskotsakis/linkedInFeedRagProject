@@ -1,0 +1,11 @@
+# langchain_community.tools.polygon.ticker_news — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/polygon/ticker_news.html
+**Word Count:** 57
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:14:56
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.polygon.ticker\_news               from typing import Optional, Type          from langchain_core.callbacks import CallbackManagerForToolRun     from langchain_core.tools import BaseTool     from pydantic import BaseModel          from langchain_community.utilities.polygon import PolygonAPIWrapper                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.polygon.ticker_news.Inputs.html#langchain_community.tools.polygon.ticker_news.Inputs)     class Inputs(BaseModel):         """Inputs for Polygon's Ticker News API"""              query: str                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.polygon.ticker_news.PolygonTickerNews.html#langchain_community.tools.polygon.ticker_news.PolygonTickerNews)     class PolygonTickerNews(BaseTool):         """Tool that gets the latest news for a given ticker from Polygon"""              mode: str = "get_ticker_news"         name: str = "polygon_ticker_news"         description: str = (             "A wrapper around Polygon's Ticker News API. "             "This tool is useful for fetching the latest news for a stock. "             "Input should be the ticker that you want to get the latest news for."         )         args_schema: Type[BaseModel] = Inputs              api_wrapper: PolygonAPIWrapper              def _run(             self,             query: str,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> str:             """Use the Polygon API tool."""             return self.api_wrapper.run(self.mode, ticker=query)

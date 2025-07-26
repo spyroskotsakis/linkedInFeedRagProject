@@ -1,0 +1,11 @@
+# langchain_community.agent_toolkits.amadeus.toolkit — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/agent_toolkits/amadeus/toolkit.html
+**Word Count:** 35
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:13:23
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.agent\_toolkits.amadeus.toolkit               from __future__ import annotations          from typing import TYPE_CHECKING, List, Optional          from langchain_core.language_models import BaseLanguageModel     from langchain_core.tools import BaseTool     from langchain_core.tools.base import BaseToolkit     from pydantic import ConfigDict, Field          from langchain_community.tools.amadeus.closest_airport import AmadeusClosestAirport     from langchain_community.tools.amadeus.flight_search import AmadeusFlightSearch     from langchain_community.tools.amadeus.utils import authenticate          if TYPE_CHECKING:         from amadeus import Client                              [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.amadeus.toolkit.AmadeusToolkit.html#langchain_community.agent_toolkits.amadeus.toolkit.AmadeusToolkit)     class AmadeusToolkit(BaseToolkit):         """Toolkit for interacting with Amadeus which offers APIs for travel.              Parameters:             client: Optional. The Amadeus client. Default is None.             llm: Optional. The language model to use. Default is None.         """              client: Client = Field(default_factory=authenticate)         llm: Optional[BaseLanguageModel] = Field(default=None)              model_config = ConfigDict(             arbitrary_types_allowed=True,         )                         [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.amadeus.toolkit.AmadeusToolkit.html#langchain_community.agent_toolkits.amadeus.toolkit.AmadeusToolkit.get_tools)         def get_tools(self) -> List[BaseTool]:             """Get the tools in the toolkit."""             return [                 AmadeusClosestAirport(llm=self.llm),                 AmadeusFlightSearch(),             ]

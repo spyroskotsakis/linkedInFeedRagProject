@@ -41,8 +41,9 @@ class LLMConfig:
 @dataclass
 class RetrievalConfig:
     """Configuration for retrieval."""
-    top_k: int = 10
-    similarity_threshold: float = 0.7
+    top_k: int = 10  # Increased from 5 to 10
+    similarity_threshold: float = 0.5  # Lowered from 0.7 to 0.5
+    min_docs_for_llm: int = 3  # Minimum docs to send to LLM
     rerank: bool = False
 
 
@@ -71,8 +72,8 @@ class RAGConfig:
         if os.getenv('RAG_LLM_PROVIDER'):
             config.llm.provider = os.getenv('RAG_LLM_PROVIDER')
         
-        if os.getenv('OLLAMA_MODEL'):
-            config.llm.model = os.getenv('OLLAMA_MODEL')
+        if os.getenv('RAG_LLM_MODEL'):
+            config.llm.model = os.getenv('RAG_LLM_MODEL')
         
         if os.getenv('OLLAMA_BASE_URL'):
             config.llm.base_url = os.getenv('OLLAMA_BASE_URL')

@@ -1,0 +1,11 @@
+# langchain_community.agent_toolkits.azure_ai_services — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/agent_toolkits/azure_ai_services.html
+**Word Count:** 22
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:15:40
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.agent\_toolkits.azure\_ai\_services               from __future__ import annotations          from typing import List          from langchain_core.tools import BaseTool     from langchain_core.tools.base import BaseToolkit          from langchain_community.tools.azure_ai_services import (         AzureAiServicesDocumentIntelligenceTool,         AzureAiServicesImageAnalysisTool,         AzureAiServicesSpeechToTextTool,         AzureAiServicesTextAnalyticsForHealthTool,         AzureAiServicesTextToSpeechTool,     )                              [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.azure_ai_services.AzureAiServicesToolkit.html#langchain_community.agent_toolkits.azure_ai_services.AzureAiServicesToolkit)     class AzureAiServicesToolkit(BaseToolkit):         """Toolkit for Azure AI Services."""                         [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.azure_ai_services.AzureAiServicesToolkit.html#langchain_community.agent_toolkits.azure_ai_services.AzureAiServicesToolkit.get_tools)         def get_tools(self) -> List[BaseTool]:             """Get the tools in the toolkit."""                  tools: List[BaseTool] = [                 AzureAiServicesDocumentIntelligenceTool(),  # type: ignore[call-arg]                 AzureAiServicesImageAnalysisTool(),                 AzureAiServicesSpeechToTextTool(),  # type: ignore[call-arg]                 AzureAiServicesTextToSpeechTool(),  # type: ignore[call-arg]                 AzureAiServicesTextAnalyticsForHealthTool(),  # type: ignore[call-arg]             ]                  return tools

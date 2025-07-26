@@ -1,0 +1,11 @@
+# langchain_community.agent_toolkits.cassandra_database.toolkit — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/agent_toolkits/cassandra_database/toolkit.html
+**Word Count:** 25
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:12:38
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.agent\_toolkits.cassandra\_database.toolkit               """Apache Cassandra Toolkit."""          from typing import List          from langchain_core.tools import BaseTool     from langchain_core.tools.base import BaseToolkit     from pydantic import ConfigDict, Field          from langchain_community.tools.cassandra_database.tool import (         GetSchemaCassandraDatabaseTool,         GetTableDataCassandraDatabaseTool,         QueryCassandraDatabaseTool,     )     from langchain_community.utilities.cassandra_database import CassandraDatabase                              [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.cassandra_database.toolkit.CassandraDatabaseToolkit.html#langchain_community.agent_toolkits.cassandra_database.toolkit.CassandraDatabaseToolkit)     class CassandraDatabaseToolkit(BaseToolkit):         """Toolkit for interacting with an Apache Cassandra database.              Parameters:             db: CassandraDatabase. The Cassandra database to interact                 with.         """              db: CassandraDatabase = Field(exclude=True)              model_config = ConfigDict(             arbitrary_types_allowed=True,         )                         [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.cassandra_database.toolkit.CassandraDatabaseToolkit.html#langchain_community.agent_toolkits.cassandra_database.toolkit.CassandraDatabaseToolkit.get_tools)         def get_tools(self) -> List[BaseTool]:             """Get the tools in the toolkit."""             return [                 GetSchemaCassandraDatabaseTool(db=self.db),                 QueryCassandraDatabaseTool(db=self.db),                 GetTableDataCassandraDatabaseTool(db=self.db),             ]

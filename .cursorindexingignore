@@ -1,0 +1,3 @@
+# Exclude everything by default that's in gitignore, but include documentation
+!documents/
+!documents/**

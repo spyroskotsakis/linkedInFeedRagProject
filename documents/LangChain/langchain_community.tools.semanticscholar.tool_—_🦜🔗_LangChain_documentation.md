@@ -1,0 +1,11 @@
+# langchain_community.tools.semanticscholar.tool — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/semanticscholar/tool.html
+**Word Count:** 47
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:18:00
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.semanticscholar.tool               """Tool for the SemanticScholar API."""          from typing import Optional, Type          from langchain_core.callbacks import CallbackManagerForToolRun     from langchain_core.tools import BaseTool     from pydantic import BaseModel, Field          from langchain_community.utilities.semanticscholar import SemanticScholarAPIWrapper                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.semanticscholar.tool.SemantscholarInput.html#langchain_community.tools.semanticscholar.tool.SemantscholarInput)     class SemantscholarInput(BaseModel):         """Input for the SemanticScholar tool."""              query: str = Field(description="search query to look up")                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.semanticscholar.tool.SemanticScholarQueryRun.html#langchain_community.tools.semanticscholar.tool.SemanticScholarQueryRun)     class SemanticScholarQueryRun(BaseTool):         """Tool that searches the semanticscholar API."""              name: str = "semanticscholar"         description: str = (             "A wrapper around semantischolar.org "             "Useful for when you need to answer to questions"             "from research papers."             "Input should be a search query."         )         api_wrapper: SemanticScholarAPIWrapper = Field(             default_factory=SemanticScholarAPIWrapper  # type: ignore[arg-type]         )         args_schema: Type[BaseModel] = SemantscholarInput              def _run(             self,             query: str,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> str:             """Use the Semantic Scholar tool."""             return self.api_wrapper.run(query)

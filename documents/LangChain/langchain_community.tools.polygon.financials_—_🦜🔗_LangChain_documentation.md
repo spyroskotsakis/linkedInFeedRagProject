@@ -1,0 +1,11 @@
+# langchain_community.tools.polygon.financials — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/tools/polygon/financials.html
+**Word Count:** 66
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:18:00
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.tools.polygon.financials               from typing import Optional, Type          from langchain_core.callbacks import CallbackManagerForToolRun     from langchain_core.tools import BaseTool     from pydantic import BaseModel          from langchain_community.utilities.polygon import PolygonAPIWrapper                              [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.polygon.financials.Inputs.html#langchain_community.tools.polygon.financials.Inputs)     class Inputs(BaseModel):         """Inputs for Polygon's Financials API"""              query: str                                             [[docs]](https://python.langchain.com/api_reference/community/tools/langchain_community.tools.polygon.financials.PolygonFinancials.html#langchain_community.tools.polygon.financials.PolygonFinancials)     class PolygonFinancials(BaseTool):         """Tool that gets the financials of a ticker from Polygon"""              mode: str = "get_financials"         name: str = "polygon_financials"         description: str = (             "A wrapper around Polygon's Stock Financials API. "             "This tool is useful for fetching fundamental financials from "             "balance sheets, income statements, and cash flow statements "             "for a stock ticker. The input should be the ticker that you want "             "to get the latest fundamental financial data for."         )         args_schema: Type[BaseModel] = Inputs              api_wrapper: PolygonAPIWrapper              def _run(             self,             query: str,             run_manager: Optional[CallbackManagerForToolRun] = None,         ) -> str:             """Use the Polygon API tool."""             return self.api_wrapper.run(self.mode, ticker=query)

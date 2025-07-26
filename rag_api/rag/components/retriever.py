@@ -19,8 +19,9 @@ class Retriever:
         self.config = config
         self.embedding_manager = embedding_manager
         self.llm_manager = llm_manager
-        self.max_results = config.get("max_results", 5)
-        self.similarity_threshold = config.get("similarity_threshold", 0.7)
+        self.max_results = config.get("max_results", 10)  # Increased from 5 to 10
+        self.similarity_threshold = config.get("similarity_threshold", 0.5)  # Lowered from 0.7 to 0.5
+        self.min_docs_for_llm = config.get("min_docs_for_llm", 3)  # Minimum docs to send to LLM
         self._initialized = False
     
     async def initialize(self):
@@ -42,6 +43,19 @@ class Retriever:
             logger.error(f"Failed to initialize retriever: {e}")
             raise
     
+    def build_context(self, doc, i):
+        meta = doc.get("metadata", {})
+        return (
+            f"Document {i}:\n"
+            f"Author: {meta.get('author', 'Unknown')}\n"
+            f"Content: {doc.get('content', '')}\n"
+            f"Likes: {meta.get('likes', 0)}\n"
+            f"Comments: {meta.get('comments', 0)}\n"
+            f"Shares: {meta.get('shares', 0)}\n"
+            f"Timestamp: {meta.get('timestamp', '')}\n"
+            f"URL: {meta.get('url', '')}"
+        )
+
     async def retrieve_and_generate(self, query: str, collection_name: str) -> Dict[str, Any]:
         """Retrieve relevant documents and generate a response."""
         if not self._initialized:
@@ -65,8 +79,18 @@ class Retriever:
                 if doc.get("distance", 1.0) <= self.similarity_threshold
             ]
             
+            # Fallback: If no docs meet threshold, use top N docs anyway
+            if not filtered_docs and retrieved_docs:
+                logger.warning(f"No documents met similarity threshold ({self.similarity_threshold}). Using top {self.min_docs_for_llm} docs as fallback.")
+                filtered_docs = retrieved_docs[:self.min_docs_for_llm]
+            elif len(filtered_docs) < self.min_docs_for_llm and retrieved_docs:
+                # If we have some docs but not enough, add more from retrieved
+                additional_docs = [doc for doc in retrieved_docs if doc not in filtered_docs]
+                filtered_docs.extend(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])
+                logger.info(f"Added {len(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])} additional docs to meet minimum requirement")
+            
             if not filtered_docs:
-                logger.warning("No documents met similarity threshold")
+                logger.warning("No documents available at all")
                 return {
                     "answer": "I couldn't find any relevant information in the available documents.",
                     "sources": [],
@@ -78,10 +102,23 @@ class Retriever:
                     }
                 }
             
-            logger.info(f"Using {len(filtered_docs)} documents after filtering")
+            logger.info(f"Using {len(filtered_docs)} documents after filtering and fallback")
             
             # Step 3: Generate response using LLM
-            answer = await self.llm_manager.generate_rag_response(query, filtered_docs)
+            try:
+                context_parts = [self.build_context(doc, i+1) for i, doc in enumerate(filtered_docs)]
+                context = "\n\n".join(context_parts)
+                answer = await self.llm_manager.generate_response(
+                    prompt=f"Based on the following documents, please answer this question: {query}",
+                    context=context
+                )
+                logger.info("LLM manager generate_response completed successfully")
+            except Exception as e:
+                logger.error(f"LLM manager generate_response failed: {e}")
+                logger.error(f"Error type: {type(e)}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                raise
             
             # Step 4: Prepare response
             sources = []

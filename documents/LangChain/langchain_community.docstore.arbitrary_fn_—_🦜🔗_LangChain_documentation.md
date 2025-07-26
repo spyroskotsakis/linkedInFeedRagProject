@@ -1,0 +1,11 @@
+# langchain_community.docstore.arbitrary_fn — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/docstore/arbitrary_fn.html
+**Word Count:** 53
+**Links Count:** 15
+**Scraped:** 2025-07-21 09:17:16
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.docstore.arbitrary\_fn               from typing import Callable, Union          from langchain_core.documents import Document          from langchain_community.docstore.base import Docstore                              [[docs]](https://python.langchain.com/api_reference/community/docstore/langchain_community.docstore.arbitrary_fn.DocstoreFn.html#langchain_community.docstore.arbitrary_fn.DocstoreFn)     class DocstoreFn(Docstore):         """Docstore via arbitrary lookup function.              This is useful when:          * it's expensive to construct an InMemoryDocstore/dict          * you retrieve documents from remote sources          * you just want to reuse existing objects         """                         [[docs]](https://python.langchain.com/api_reference/community/docstore/langchain_community.docstore.arbitrary_fn.DocstoreFn.html#langchain_community.docstore.arbitrary_fn.DocstoreFn.__init__)         def __init__(             self,             lookup_fn: Callable[[str], Union[Document, str]],         ):             self._lookup_fn = lookup_fn                                        [[docs]](https://python.langchain.com/api_reference/community/docstore/langchain_community.docstore.arbitrary_fn.DocstoreFn.html#langchain_community.docstore.arbitrary_fn.DocstoreFn.search)         def search(self, search: str) -> Document:             """Search for a document.                  Args:                 search: search string                  Returns:                 Document if found, else error message.             """             r = self._lookup_fn(search)             if isinstance(r, str):                 # NOTE: assume the search string is the source ID                 return Document(page_content=r, metadata={"source": search})             elif isinstance(r, Document):                 return r             raise ValueError(f"Unexpected type of document {type(r)}")

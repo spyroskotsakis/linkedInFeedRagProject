@@ -1,0 +1,11 @@
+# langchain_core.utils.strings — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_core/utils/strings.html
+**Word Count:** 39
+**Links Count:** 15
+**Scraped:** 2025-07-21 08:57:35
+**Status:** completed
+
+---
+
+# Source code for langchain\_core.utils.strings               """String utilities."""          from typing import Any                              [[docs]](https://python.langchain.com/api_reference/core/utils/langchain_core.utils.strings.stringify_value.html#langchain_core.utils.strings.stringify_value)     def stringify_value(val: Any) -> str:         """Stringify a value.              Args:             val: The value to stringify.              Returns:             str: The stringified value.         """         if isinstance(val, str):             return val         if isinstance(val, dict):             return "\n" + stringify_dict(val)         if isinstance(val, list):             return "\n".join(stringify_value(v) for v in val)         return str(val)                                             [[docs]](https://python.langchain.com/api_reference/core/utils/langchain_core.utils.strings.stringify_dict.html#langchain_core.utils.strings.stringify_dict)     def stringify_dict(data: dict) -> str:         """Stringify a dictionary.              Args:             data: The dictionary to stringify.              Returns:             str: The stringified dictionary.         """         text = ""         for key, value in data.items():             text += key + ": " + stringify_value(value) + "\n"         return text                                             [[docs]](https://python.langchain.com/api_reference/core/utils/langchain_core.utils.strings.comma_list.html#langchain_core.utils.strings.comma_list)     def comma_list(items: list[Any]) -> str:         """Convert a list to a comma-separated string.              Args:             items: The list to convert.              Returns:             str: The comma-separated string.         """         return ", ".join(str(item) for item in items)

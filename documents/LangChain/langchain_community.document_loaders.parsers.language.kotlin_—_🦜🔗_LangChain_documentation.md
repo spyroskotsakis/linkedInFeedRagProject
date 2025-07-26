@@ -1,0 +1,11 @@
+# langchain_community.document_loaders.parsers.language.kotlin — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/document_loaders/parsers/language/kotlin.html
+**Word Count:** 12
+**Links Count:** 16
+**Scraped:** 2025-07-21 09:15:40
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.document\_loaders.parsers.language.kotlin               from typing import TYPE_CHECKING          from langchain_community.document_loaders.parsers.language.tree_sitter_segmenter import (  # noqa: E501         TreeSitterSegmenter,     )          if TYPE_CHECKING:         from tree_sitter import Language               CHUNK_QUERY = """         [             (function_declaration) @function             (class_declaration) @class         ]     """.strip()                              [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.html#langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter)     class KotlinSegmenter(TreeSitterSegmenter):         """Code segmenter for Kotlin."""                         [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.html#langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.get_language)         def get_language(self) -> "Language":             from tree_sitter_languages import get_language                  return get_language("kotlin")                                        [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.html#langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.get_chunk_query)         def get_chunk_query(self) -> str:             return CHUNK_QUERY                                        [[docs]](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.html#langchain_community.document_loaders.parsers.language.kotlin.KotlinSegmenter.make_line_comment)         def make_line_comment(self, text: str) -> str:             return f"// {text}"

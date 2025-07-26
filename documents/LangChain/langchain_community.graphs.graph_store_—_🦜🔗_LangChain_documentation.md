@@ -1,0 +1,11 @@
+# langchain_community.graphs.graph_store — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/graphs/graph_store.html
+**Word Count:** 37
+**Links Count:** 16
+**Scraped:** 2025-07-21 09:15:40
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.graphs.graph\_store               from abc import abstractmethod     from typing import Any, Dict, List          from langchain_community.graphs.graph_document import GraphDocument                              [[docs]](https://python.langchain.com/api_reference/community/graphs/langchain_community.graphs.graph_store.GraphStore.html#langchain_community.graphs.graph_store.GraphStore)     class GraphStore:         """Abstract class for graph operations."""              @property         @abstractmethod         def get_schema(self) -> str:             """Return the schema of the Graph database"""             pass              @property         @abstractmethod         def get_structured_schema(self) -> Dict[str, Any]:             """Return the schema of the Graph database"""             pass                         [[docs]](https://python.langchain.com/api_reference/community/graphs/langchain_community.graphs.graph_store.GraphStore.html#langchain_community.graphs.graph_store.GraphStore.query)         @abstractmethod         def query(self, query: str, params: dict = {}) -> List[Dict[str, Any]]:             """Query the graph."""             pass                                        [[docs]](https://python.langchain.com/api_reference/community/graphs/langchain_community.graphs.graph_store.GraphStore.html#langchain_community.graphs.graph_store.GraphStore.refresh_schema)         @abstractmethod         def refresh_schema(self) -> None:             """Refresh the graph schema information."""             pass                                        [[docs]](https://python.langchain.com/api_reference/community/graphs/langchain_community.graphs.graph_store.GraphStore.html#langchain_community.graphs.graph_store.GraphStore.add_graph_documents)         @abstractmethod         def add_graph_documents(             self, graph_documents: List[GraphDocument], include_source: bool = False         ) -> None:             """Take GraphDocument as input as uses it to construct a graph."""             pass

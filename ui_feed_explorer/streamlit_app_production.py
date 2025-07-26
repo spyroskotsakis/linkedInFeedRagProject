@@ -650,19 +650,33 @@ def main():
             # Search button
             if st.button("🔍 Search", type="primary"):
                 if query.strip():
+                    # Set search performed flag
+                    st.session_state.rag_search_performed = True
+                    
                     with st.spinner("Searching with AI..."):
                         result = asyncio.run(
                             query_rag_system(query, f"linkedin_posts_{selected_dir_name}", max_results)
                         )
                         
+                        # Debug information
+                        st.markdown("### 🔍 Search Results")
+                        
                         if "error" in result:
-                            st.error(f"Search failed: {result['error']}")
+                            st.error(f"❌ Search failed: {result['error']}")
+                            st.info("💡 **Troubleshooting:**")
+                            st.info("1. Check if the RAG API is running (use 'Check RAG Status' in sidebar)")
+                            st.info("2. Make sure you've indexed your data (click 'Rebuild Index')")
+                            st.info("3. Verify Ollama is running if using local LLM")
                         else:
                             # Display answer
-                            st.markdown('<div class="rag-response">', unsafe_allow_html=True)
-                            st.markdown("### 🤖 AI Answer")
-                            st.write(result.get("answer", "No answer generated"))
-                            st.markdown('</div>', unsafe_allow_html=True)
+                            answer = result.get("answer", "")
+                            if answer:
+                                st.markdown('<div class="rag-response">', unsafe_allow_html=True)
+                                st.markdown("### 🤖 AI Answer")
+                                st.write(answer)
+                                st.markdown('</div>', unsafe_allow_html=True)
+                            else:
+                                st.warning("⚠️ No answer generated. The RAG system may not have found relevant information.")
                             
                             # Display sources
                             sources = result.get("sources", [])
@@ -671,13 +685,37 @@ def main():
                                 for i, source in enumerate(sources[:5]):  # Show top 5 sources
                                     st.markdown('<div class="rag-source">', unsafe_allow_html=True)
                                     st.markdown(f"**Source {i+1}:**")
-                                    st.write(source.get("content", "")[:200] + "...")
+                                    content = source.get("content", "")
+                                    if content:
+                                        st.write(content[:200] + "..." if len(content) > 200 else content)
+                                    else:
+                                        st.write("No content available")
+                                    
                                     if source.get("metadata"):
                                         metadata = source["metadata"]
                                         st.caption(f"Author: {metadata.get('author', 'Unknown')} | Likes: {metadata.get('likes', 0)}")
                                     st.markdown('</div>', unsafe_allow_html=True)
+                            else:
+                                st.info("📚 No sources found. This might indicate the data hasn't been indexed yet.")
+                                st.info("💡 **Solution:** Click 'Rebuild Index' in the configuration panel.")
                 else:
                     st.warning("Please enter a question to search.")
+            
+            # Show help when no search has been performed
+            if not st.session_state.get("rag_search_performed", False):
+                st.markdown("### 💡 Getting Started")
+                st.info("""
+                **To use RAG Search:**
+                1. **Index your data** - Click "Rebuild Index" in the configuration panel
+                2. **Ask a question** - Type your question in the text area above
+                3. **Click Search** - Get AI-powered answers with source citations
+                
+                **Example questions:**
+                - "What are the most discussed topics?"
+                - "Who are the most engaging authors?"
+                - "Find posts about AI and machine learning"
+                - "What content gets the most likes?"
+                """)
 
 if __name__ == "__main__":
     main() 

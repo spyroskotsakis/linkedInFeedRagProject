@@ -1,0 +1,11 @@
+# langchain_community.agent_toolkits.azure_cognitive_services — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_community/agent_toolkits/azure_cognitive_services.html
+**Word Count:** 31
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:18:23
+**Status:** completed
+
+---
+
+# Source code for langchain\_community.agent\_toolkits.azure\_cognitive\_services               from __future__ import annotations          import sys     from typing import List          from langchain_core.tools import BaseTool     from langchain_core.tools.base import BaseToolkit          from langchain_community.tools.azure_cognitive_services import (         AzureCogsFormRecognizerTool,         AzureCogsImageAnalysisTool,         AzureCogsSpeech2TextTool,         AzureCogsText2SpeechTool,         AzureCogsTextAnalyticsHealthTool,     )                              [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.azure_cognitive_services.AzureCognitiveServicesToolkit.html#langchain_community.agent_toolkits.azure_cognitive_services.AzureCognitiveServicesToolkit)     class AzureCognitiveServicesToolkit(BaseToolkit):         """Toolkit for Azure Cognitive Services."""                         [[docs]](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.azure_cognitive_services.AzureCognitiveServicesToolkit.html#langchain_community.agent_toolkits.azure_cognitive_services.AzureCognitiveServicesToolkit.get_tools)         def get_tools(self) -> List[BaseTool]:             """Get the tools in the toolkit."""                  tools: List[BaseTool] = [                 AzureCogsFormRecognizerTool(),  # type: ignore[call-arg]                 AzureCogsSpeech2TextTool(),  # type: ignore[call-arg]                 AzureCogsText2SpeechTool(),  # type: ignore[call-arg]                 AzureCogsTextAnalyticsHealthTool(),  # type: ignore[call-arg]             ]                  # TODO: Remove check once azure-ai-vision supports MacOS.             if sys.platform.startswith("linux") or sys.platform.startswith("win"):                 tools.append(AzureCogsImageAnalysisTool())  # type: ignore[call-arg]             return tools

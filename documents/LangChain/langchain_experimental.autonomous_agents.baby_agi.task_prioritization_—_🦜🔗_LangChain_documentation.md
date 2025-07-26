@@ -1,0 +1,11 @@
+# langchain_experimental.autonomous_agents.baby_agi.task_prioritization — 🦜🔗 LangChain  documentation
+
+**URL:** https://python.langchain.com/api_reference/_modules/langchain_experimental/autonomous_agents/baby_agi/task_prioritization.html
+**Word Count:** 59
+**Links Count:** 14
+**Scraped:** 2025-07-21 09:19:06
+**Status:** completed
+
+---
+
+# Source code for langchain\_experimental.autonomous\_agents.baby\_agi.task\_prioritization               from langchain.chains import LLMChain     from langchain_core.language_models import BaseLanguageModel     from langchain_core.prompts import PromptTemplate                              [[docs]](https://python.langchain.com/api_reference/experimental/autonomous_agents/langchain_experimental.autonomous_agents.baby_agi.task_prioritization.TaskPrioritizationChain.html#langchain_experimental.autonomous_agents.baby_agi.task_prioritization.TaskPrioritizationChain)     class TaskPrioritizationChain(LLMChain):         """Chain to prioritize tasks."""                         [[docs]](https://python.langchain.com/api_reference/experimental/autonomous_agents/langchain_experimental.autonomous_agents.baby_agi.task_prioritization.TaskPrioritizationChain.html#langchain_experimental.autonomous_agents.baby_agi.task_prioritization.TaskPrioritizationChain.from_llm)         @classmethod         def from_llm(cls, llm: BaseLanguageModel, verbose: bool = True) -> LLMChain:             """Get the response parser."""             task_prioritization_template = (                 "You are a task prioritization AI tasked with cleaning the formatting of "                 "and reprioritizing the following tasks: {task_names}."                 " Consider the ultimate objective of your team: {objective}."                 " Do not remove any tasks. Return the result as a numbered list, like:"                 " #. First task"                 " #. Second task"                 " Start the task list with number {next_task_id}."             )             prompt = PromptTemplate(                 template=task_prioritization_template,                 input_variables=["task_names", "next_task_id", "objective"],             )             return cls(prompt=prompt, llm=llm, verbose=verbose)
