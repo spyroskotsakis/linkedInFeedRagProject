@@ -1,0 +1,5 @@
+streamlit==1.28.1
+polars==0.20.5
+streamlit-aggrid==0.3.4
+httpx==0.25.2
+python-dotenv==1.0.0 

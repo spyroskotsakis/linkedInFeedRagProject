@@ -244,8 +244,36 @@ def export_filtered_data(grid_response: Dict[str, Any], filename: str = "filtere
             st.warning("No rows selected for export")
             return
         
+        # Flatten nested data for CSV export
+        flattened_data = []
+        for row in data:
+            flattened_row = {}
+            try:
+                for key, value in row.items():
+                    if isinstance(value, dict):
+                        # Flatten nested dictionaries
+                        try:
+                            for nested_key, nested_value in value.items():
+                                flattened_row[f"{key}_{nested_key}"] = nested_value
+                        except AttributeError:
+                            # Handle case where value is not a dict but has dict-like structure
+                            flattened_row[key] = str(value)
+                    elif isinstance(value, list):
+                        # Convert lists to strings
+                        flattened_row[key] = str(value)
+                    else:
+                        flattened_row[key] = value
+            except AttributeError as e:
+                # Handle case where row is not a dictionary
+                logger.warning(f"Row is not a dictionary: {type(row)}, value: {row}")
+                if isinstance(row, str):
+                    flattened_row['content'] = row
+                else:
+                    flattened_row['data'] = str(row)
+            flattened_data.append(flattened_row)
+        
         # Convert to CSV
-        df = pl.DataFrame(data)
+        df = pl.DataFrame(flattened_data)
         csv_data = df.write_csv()
         
         st.download_button(

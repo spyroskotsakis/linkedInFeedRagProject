@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # RAG API Service
+  rag-api:
+    build:
+      context: ./rag_api
+      dockerfile: Dockerfile
+    container_name: linkedin-rag-api
+    ports:
+      - "8000:8000"
+    environment:
+      - RAG_EMBEDDING_MODEL=all-MiniLM-L6-v2
+      - RAG_VECTOR_STORE_PATH=/app/vector_store
+      - RAG_LLM_PROVIDER=ollama
+      - RAG_LLM_MODEL=mistral-nemo:12b
+      - RAG_LLM_TEMPERATURE=0.1
+      - RAG_LLM_MAX_TOKENS=2048
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT:-}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT:-}
+    volumes:
+      - rag_vector_store:/app/vector_store
+      - ./data:/app/data:ro
+    networks:
+      - linkedin-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Streamlit UI Service
+  streamlit-ui:
+    build:
+      context: ./ui_feed_explorer
+      dockerfile: Dockerfile
+    container_name: linkedin-streamlit-ui
+    ports:
+      - "8501:8501"
+    environment:
+      - RAG_API_URL=http://rag-api:8000
+    volumes:
+      - ./data:/app/data:ro
+      - ./ui_feed_explorer/.streamlit:/app/.streamlit:ro
+    networks:
+      - linkedin-network
+    depends_on:
+      rag-api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  rag_vector_store:
+    driver: local
+
+networks:
+  linkedin-network:
+    driver: bridge 
