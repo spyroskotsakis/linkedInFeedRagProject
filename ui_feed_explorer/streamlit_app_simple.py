@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LinkedIn Feed Explorer - Fixed Version
+LinkedIn Feed Explorer - Simple Version (No RAG)
 """
 
 import streamlit as st
@@ -21,24 +21,6 @@ from utils.grid import render_grid, show_grid_stats, export_filtered_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Optional RAG imports - gracefully handle missing dependencies
-RAG_AVAILABLE = False
-try:
-    # Only import RAG modules if they're available and compatible
-    from rag.embeddings import index_dataframe, get_embedding_manager
-    from rag.llm_factory import get_provider_factory, get_session_llm_config, update_session_llm_config
-    from rag.rag_graph import run_rag_query
-    RAG_AVAILABLE = True
-    logger.info("✅ RAG functionality enabled")
-except ImportError as e:
-    logger.warning(f"RAG functionality disabled due to missing dependencies: {e}")
-    st.warning(f"RAG functionality disabled due to missing dependencies: {e}")
-    st.info("To enable RAG features, install: pip install langchain langchain-core langchain-community chromadb sentence-transformers")
-except Exception as e:
-    logger.warning(f"RAG functionality disabled due to compatibility issues: {e}")
-    st.warning(f"RAG functionality disabled due to compatibility issues: {e}")
-    st.info("The app will work without RAG features. Core functionality is available.")
-
 # Page configuration
 st.set_page_config(
     page_title="LinkedIn Feed Explorer",
@@ -54,19 +36,6 @@ st.markdown("""
     padding: 1rem;
     border-radius: 0.5rem;
     margin: 0.5rem 0;
-}
-.rag-response {
-    background-color: #e8f4f8;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border-left: 4px solid #0066cc;
-}
-.citation {
-    background-color: #f8f9fa;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    margin: 0.25rem 0;
-    font-size: 0.9rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -118,7 +87,7 @@ def get_post_timestamp(row):
 
 def main():
     st.title("🔍 LinkedIn Feed Explorer")
-    st.markdown("*Explore LinkedIn posts with advanced search and AI-powered question answering*")
+    st.markdown("*Explore LinkedIn posts with interactive visualizations and analytics*")
 
     # --- Sidebar for Export Selection ---
     with st.sidebar:
@@ -160,21 +129,10 @@ def main():
                 st.metric("Size", f"{metadata['total_size_mb']:.1f} MB")
                 st.metric("Format", "Parquet" if metadata["has_parquet"] else "CSV/JSON")
 
-            # RAG System Status
-            if RAG_AVAILABLE:
-                st.markdown("### 🤖 RAG System")
-                try:
-                    factory = get_provider_factory()
-                    providers = factory.get_available_providers()
-
-                    for name, available in providers.items():
-                        status = "🟢" if available else "🔴"
-                        st.write(f"{status} {name.title()}: {'Available' if available else 'Not configured'}")
-                except Exception as e:
-                    st.warning(f"RAG system status unavailable: {e}")
-            else:
-                st.markdown("### 🤖 RAG System")
-                st.info("RAG functionality is disabled. Core features are available.")
+            # Feature status
+            st.markdown("### 🚀 Features")
+            st.info("✅ Core visualization features enabled")
+            st.info("ℹ️ RAG features available in full version")
 
     # --- Load Data ---
     if selected_dir_path and selected_dir_path.exists():
@@ -195,21 +153,12 @@ def main():
     if not df.is_empty() and validation.get("is_valid", False):
 
         # Main tabs
-        if RAG_AVAILABLE:
-            tab1, tab2, tab3, tab4, tab5 = st.tabs([
-                "📊 Overview",
-                "📄 Data Grid",
-                "🖼️ Card View",
-                "📈 Analytics",
-                "🔍 RAG Search"
-            ])
-        else:
-            tab1, tab2, tab3, tab4 = st.tabs([
-                "📊 Overview",
-                "📄 Data Grid",
-                "🖼️ Card View",
-                "📈 Analytics"
-            ])
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "📊 Overview",
+            "📄 Data Grid",
+            "🖼️ Card View",
+            "📈 Analytics"
+        ])
 
         with tab1:
             st.header("📊 Dataset Overview")
@@ -438,143 +387,6 @@ def main():
 
                 except Exception as e:
                     st.warning(f"Could not analyze author statistics: {e}")
-
-        # RAG Search Tab (only if available)
-        if RAG_AVAILABLE and len(st.tabs) > 4:
-            with tab5:
-                st.header("🔍 RAG Search - AI-Powered Question Answering")
-
-                # RAG configuration
-                rag_col1, rag_col2 = st.columns([2, 1])
-
-                with rag_col2:
-                    st.markdown("### ⚙️ Configuration")
-
-                    # LLM provider selection
-                    try:
-                        factory = get_provider_factory()
-                        providers = factory.get_available_providers()
-                        available_providers = [name for name, available in providers.items() if available]
-
-                        if not available_providers:
-                            st.error("No LLM providers are available. Please configure Ollama or Azure OpenAI.")
-                            st.info("""
-                            **Setup Options:**
-                            - **Ollama**: Install and run `ollama pull mistral-nemo:12b`
-                            - **Azure OpenAI**: Set environment variables for endpoint and API key
-                            """)
-                            return
-
-                        current_config = get_session_llm_config()
-
-                        provider = st.selectbox(
-                            "LLM Provider",
-                            available_providers,
-                            index=available_providers.index(current_config["provider"]) if current_config["provider"] in available_providers else 0
-                        )
-
-                        temperature = st.slider("Temperature", 0.0, 1.0, current_config["temperature"], 0.1)
-                        max_tokens = st.slider("Max Tokens", 100, 4000, current_config.get("max_tokens", 2048), 100)
-
-                        # Update configuration
-                        update_session_llm_config({
-                            "provider": provider,
-                            "temperature": temperature,
-                            "max_tokens": max_tokens
-                        })
-
-                        # Index management
-                        st.markdown("### 📚 Vector Index")
-                        embedding_manager = get_embedding_manager()
-
-                        try:
-                            stats = embedding_manager.get_collection_stats()
-                            if stats.get("document_count", 0) > 0:
-                                st.success(f"✅ {stats['document_count']} documents indexed")
-                            else:
-                                st.warning("⚠️ No documents indexed")
-                        except:
-                            st.warning("⚠️ No vector index found")
-
-                        if st.button("🔄 Rebuild Index"):
-                            with st.spinner("Indexing documents..."):
-                                try:
-                                    success = index_dataframe(df, f"linkedin_posts_{selected_dir_name}")
-                                    if success:
-                                        st.success("✅ Index rebuilt successfully!")
-                                        st.rerun()
-                                    else:
-                                        st.error("❌ Failed to rebuild index")
-                                except Exception as e:
-                                    st.error(f"❌ Indexing failed: {e}")
-
-                    except Exception as e:
-                        st.error(f"RAG configuration error: {e}")
-                        return
-
-                with rag_col1:
-                    st.markdown("### 💬 Ask Questions About Your LinkedIn Data")
-
-                    # Query input
-                    query = st.text_area(
-                        "Your Question:",
-                        placeholder="What are the main trends discussed in these posts? Who are the most active contributors? What career advice is being shared?",
-                        height=100
-                    )
-
-                    # Example queries
-                    with st.expander("💡 Example Questions"):
-                        example_queries = [
-                            "What are people saying about artificial intelligence and machine learning?",
-                            "What career advice is being shared in these posts?",
-                            "Who are the most influential authors in this dataset?",
-                            "What are the trending topics and hashtags?",
-                            "What challenges are professionals discussing?",
-                            "What insights about remote work are shared?"
-                        ]
-
-                        for i, example in enumerate(example_queries):
-                            if st.button(f"💭 {example}", key=f"example_{i}"):
-                                query = example
-                                st.rerun()
-
-                    # Search button
-                    if st.button("🔍 Search", type="primary", disabled=not query.strip()):
-                        if not query.strip():
-                            st.warning("Please enter a question")
-                        else:
-                            with st.spinner("🤖 Analyzing posts and generating answer..."):
-                                try:
-                                    result = run_rag_query(query, f"linkedin_posts_{selected_dir_name}")
-
-                                    # Display results
-                                    if result.get("error"):
-                                        st.error(f"❌ Error: {result['error']}")
-                                    else:
-                                        # Answer
-                                        st.markdown("### 🎯 Answer")
-                                        st.markdown(f'<div class="rag-response">{result["answer"]}</div>', unsafe_allow_html=True)
-
-                                        # Metadata
-                                        col1, col2, col3 = st.columns(3)
-                                        with col1:
-                                            st.metric("Confidence", f"{result['confidence_score']:.1%}")
-                                        with col2:
-                                            st.metric("Sources Used", result["document_count"])
-                                        with col3:
-                                            search_meta = result.get("search_metadata", {})
-                                            avg_sim = search_meta.get("avg_similarity", 0)
-                                            st.metric("Avg Similarity", f"{avg_sim:.2f}")
-
-                                        # Citations
-                                        if result["citations"]:
-                                            st.markdown("### 📚 Sources")
-                                            for i, citation in enumerate(result["citations"]):
-                                                st.markdown(f'<div class="citation"><strong>Source {i+1}:</strong> {citation}</div>', unsafe_allow_html=True)
-
-                                except Exception as e:
-                                    st.error(f"❌ Search failed: {str(e)}")
-                                    logger.error(f"RAG search error: {e}")
 
     else:
         if df.is_empty():

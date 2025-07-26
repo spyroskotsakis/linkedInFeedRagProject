@@ -12,7 +12,7 @@ cd ui_feed_explorer
 
 # Run the Streamlit app (make sure you're in the conda environment)
 source activate_env.sh
-streamlit run streamlit_app.py
+streamlit run streamlit_app_simple.py
 ```
 
 **Access the app at:** `http://localhost:8501`
@@ -49,6 +49,7 @@ streamlit run streamlit_app.py
 - **Auto Data Discovery** - Automatically finds all your LinkedIn exports
 - **Data Validation** - Ensures data quality and completeness
 - **Export Capabilities** - Download filtered results for further analysis
+- **Format Compatibility** - Works with both old and new data formats
 
 ## 📁 Data Requirements
 
@@ -56,6 +57,36 @@ The UI Explorer automatically discovers and loads data from:
 - **Location**: `../data/` (relative to ui_feed_explorer directory)
 - **Format**: JSON, CSV, or Parquet files
 - **Structure**: LinkedIn post exports from the scraper
+
+### Supported Data Formats
+
+#### New Enhanced Format (Recommended)
+```json
+{
+  "urn": "urn:li:activity:1234567890",
+  "author": "John Doe",
+  "content": "Post content...",
+  "engagement": {
+    "likes": 42,
+    "comments": 8,
+    "shares": 3
+  },
+  "timestamp": "2024-01-24T10:30:00Z"
+}
+```
+
+#### Legacy Format (Also Supported)
+```json
+{
+  "urn": "urn:li:activity:1234567890",
+  "author": "John Doe",
+  "content": "Post content...",
+  "likes": 42,
+  "comments": 8,
+  "shares": 3,
+  "posted_at": "2024-01-24T10:30:00Z"
+}
+```
 
 ## 🎯 Use Cases
 
@@ -76,7 +107,10 @@ source activate_env.sh
 # Navigate to UI directory
 cd ui_feed_explorer
 
-# Run the application
+# Run the simple version (recommended)
+streamlit run streamlit_app_simple.py
+
+# Or run the full version with RAG (if dependencies are available)
 streamlit run streamlit_app.py
 ```
 
@@ -97,6 +131,11 @@ streamlit run streamlit_app.py
 - Use Data Grid filters to focus on specific data subsets
 - Consider exporting filtered data for external analysis
 
+### RAG functionality issues:
+- Use `streamlit_app_simple.py` for core features without RAG
+- RAG requires additional dependencies that may have compatibility issues
+- Core visualization features work without RAG dependencies
+
 ## 📋 Prerequisites
 
 1. **LinkedIn Scraper Data** - Must have run the main scraper first
@@ -111,6 +150,39 @@ streamlit run streamlit_app.py
 - ✅ **Data Integrity** - Maintains data quality and validation
 - ✅ **Export Functionality** - Reliable data export capabilities
 - ✅ **Cross-platform** - Works on Windows, macOS, and Linux
+- ✅ **Format Compatibility** - Works with both old and new data structures
+
+## 🔄 Version Information
+
+### Simple Version (`streamlit_app_simple.py`) - **RECOMMENDED**
+- ✅ **Core Features**: Overview, Data Grid, Card View, Analytics
+- ✅ **No Dependencies**: Works without RAG or additional packages
+- ✅ **Stable**: No compatibility issues with pyarrow or other libraries
+- ✅ **Fast**: Optimized for performance and reliability
+
+### Full Version (`streamlit_app.py`)
+- ✅ **All Features**: Includes RAG search functionality
+- ⚠️ **Dependencies**: Requires additional packages (may have compatibility issues)
+- ⚠️ **Complexity**: More features but potential for import errors
+
+## 🚀 Getting Started
+
+1. **Run the Scraper**:
+   ```bash
+   python complete_linkedin_scraper_enhanced_fast.py --posts 50 --speed fast
+   ```
+
+2. **Start the UI**:
+   ```bash
+   cd ui_feed_explorer
+   source activate_env.sh
+   streamlit run streamlit_app_simple.py
+   ```
+
+3. **Explore Your Data**:
+   - Select your data export from the sidebar
+   - Browse through Overview, Data Grid, Card View, and Analytics tabs
+   - Export filtered data as needed
 
 ---
 

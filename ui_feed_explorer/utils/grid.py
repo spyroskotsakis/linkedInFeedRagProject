@@ -7,6 +7,32 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def flatten_engagement_data(df: pl.DataFrame) -> pl.DataFrame:
+    """
+    Flatten engagement data from nested structure for grid display.
+    
+    Args:
+        df: Polars DataFrame with potentially nested engagement data
+        
+    Returns:
+        DataFrame with flattened engagement columns
+    """
+    try:
+        if "engagement" in df.columns:
+            # Extract engagement fields from struct
+            df_flattened = df.with_columns([
+                pl.col("engagement").struct.field("likes").alias("likes"),
+                pl.col("engagement").struct.field("comments").alias("comments"),
+                pl.col("engagement").struct.field("shares").alias("shares")
+            ])
+            return df_flattened
+        else:
+            # Already flattened or old format
+            return df
+    except Exception as e:
+        logger.warning(f"Could not flatten engagement data: {e}")
+        return df
+
 def render_grid(df: pl.DataFrame, height: int = 500, enable_enterprise_modules: bool = False) -> Dict[str, Any]:
     """
     Render ag-Grid with server-side pagination and optimized performance.
@@ -24,8 +50,11 @@ def render_grid(df: pl.DataFrame, height: int = 500, enable_enterprise_modules: 
         return {}
     
     try:
+        # Flatten engagement data for display
+        df_display = flatten_engagement_data(df)
+        
         # Convert to pandas for ag-grid compatibility
-        df_pandas = df.to_pandas()
+        df_pandas = df_display.to_pandas()
         
         # Build grid options
         gb = GridOptionsBuilder.from_dataframe(df_pandas)
@@ -55,7 +84,7 @@ def render_grid(df: pl.DataFrame, height: int = 500, enable_enterprise_modules: 
         )
         
         # Custom column configurations
-        if "content" in df.columns:
+        if "content" in df_display.columns:
             gb.configure_column(
                 "content",
                 wrapText=True,
@@ -71,16 +100,33 @@ def render_grid(df: pl.DataFrame, height: int = 500, enable_enterprise_modules: 
                 """)
             )
         
-        if "author" in df.columns:
+        if "author" in df_display.columns:
             gb.configure_column("author", width=150, pinned="left")
         
-        if "urn" in df.columns:
+        if "urn" in df_display.columns:
             gb.configure_column("urn", hide=True)  # Hide URN by default
+        
+        # URL column configuration
+        if "url" in df_display.columns:
+            gb.configure_column(
+                "url",
+                headerName="LinkedIn Link",
+                cellRenderer=JsCode("""
+                    function(params) {
+                        if (params.value) {
+                            return '<a href="' + params.value + '" target="_blank">🔗 View</a>';
+                        }
+                        return '';
+                    }
+                """),
+                width=120,
+                cellStyle={"textAlign": "center"}
+            )
         
         # Engagement columns styling
         engagement_cols = ["likes", "comments", "shares"]
         for col in engagement_cols:
-            if col in df.columns:
+            if col in df_display.columns:
                 gb.configure_column(
                     col,
                     type=["numericColumn"],
@@ -91,7 +137,7 @@ def render_grid(df: pl.DataFrame, height: int = 500, enable_enterprise_modules: 
         # Date column formatting
         date_cols = ["posted_at", "extracted_at", "timestamp"]
         for col in date_cols:
-            if col in df.columns:
+            if col in df_display.columns:
                 gb.configure_column(
                     col,
                     type=["dateColumnFilter"],

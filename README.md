@@ -825,10 +825,12 @@ cd ui_feed_explorer
 
 # Run the Streamlit app (make sure you're in the conda environment)
 source activate_env.sh
-streamlit run streamlit_app.py
+streamlit run streamlit_app_simple.py
 ```
 
 **Access the app at:** `http://localhost:8501`
+
+**Note:** Use `streamlit_app_simple.py` for core features without RAG dependencies. For full RAG functionality, use `streamlit_app.py` (may require additional setup).
 
 #### 📊 **Features**
 
