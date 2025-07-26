@@ -289,7 +289,8 @@ def main():
         print("   • Run: python setup_env.py")
         print("   • Install Ollama: curl -fsSL https://ollama.ai/install.sh | sh")
         print("   • Start Ollama: ollama serve")
-        print("   • Pull model: ollama pull mistral-nemo:12b")
+        model_name = os.getenv("RAG_LLM_MODEL", "llama3.1:8b")
+        print(f"   • Pull model: ollama pull {model_name}")
         sys.exit(1)
 
 

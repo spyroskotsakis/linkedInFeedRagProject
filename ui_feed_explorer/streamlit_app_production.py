@@ -10,6 +10,7 @@ import polars as pl
 import logging
 import httpx
 import asyncio
+import os
 from pathlib import Path
 from datetime import datetime
 import json
@@ -604,7 +605,8 @@ def main():
             )
             
             if provider == "ollama":
-                model = st.text_input("Ollama Model", value="mistral-nemo:12b", help="Ollama model name")
+                default_model = os.getenv("RAG_LLM_MODEL", "llama3.1:8b")
+                model = st.text_input("Ollama Model", value=default_model, help="Ollama model name")
             else:
                 model = st.text_input("Azure Model", value="gpt-4", help="Azure OpenAI model name")
             

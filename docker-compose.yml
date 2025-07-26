@@ -48,6 +48,7 @@ services:
       - "8501:8501"
     environment:
       - RAG_API_URL=http://rag-api:8000
+      - RAG_LLM_MODEL=llama3.1:8b
     volumes:
       - ./data:/app/data:ro
       - ./ui_feed_explorer/.streamlit:/app/.streamlit:ro

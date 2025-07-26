@@ -120,7 +120,7 @@ curl -fsSL https://ollama.ai/install.sh | sh
 ollama serve
 
 # 3. Pull required model
-ollama pull mistral-nemo:12b
+ollama pull llama3.1:8b
 
 # 4. Verify installation
 ollama list
@@ -380,7 +380,7 @@ RAG_MAX_RESULTS=5
 **Ollama (Local)**
 ```bash
 OLLAMA_BASE_URL=http://host.docker.internal:11434
-OLLAMA_MODEL=mistral-nemo:12b
+OLLAMA_MODEL=llama3.1:8b
 ```
 
 **Azure OpenAI (Cloud)**
@@ -511,7 +511,7 @@ sudo chown -R $USER:$USER ./data
 ollama serve
 
 # Model not found
-ollama pull mistral-nemo:12b
+ollama pull llama3.1:8b
 
 # Connection issues
 curl http://localhost:11434/api/tags
@@ -629,7 +629,7 @@ Body: {
 POST /config
 Body: {
   "provider": "ollama",
-  "model": "mistral-nemo:12b",
+  "model": "llama3.1:8b",
   "temperature": 0.1,
   "max_tokens": 2048
 }
@@ -857,3 +857,34 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 **Ready for production use!** 🚀📊🧠 
+
+## 🔄 **Switching LLM Models**
+
+The system uses the `RAG_LLM_MODEL` environment variable to determine which model to use. You can easily switch models without code changes:
+
+### **Method 1: Environment Variable**
+```bash
+# Set the model for the current session
+export RAG_LLM_MODEL="llama3.1:8b"
+docker-compose restart
+
+# Or set permanently in docker-compose.yml
+# RAG_LLM_MODEL=llama3.1:8b
+```
+
+### **Method 2: Update docker-compose.yml**
+```yaml
+environment:
+  - RAG_LLM_MODEL=your-preferred-model:tag
+```
+
+### **Supported Models**
+- `llama3.1:8b` (default - fast, excellent instruction following)
+- `mistral-nemo:12b` (larger, more capable)
+- `llama3.1:70b` (largest, best quality)
+- Any Ollama-compatible model
+
+### **After Changing Models**
+1. Pull the new model: `ollama pull your-new-model`
+2. Restart containers: `docker-compose restart`
+3. The UI will automatically show the new model name 

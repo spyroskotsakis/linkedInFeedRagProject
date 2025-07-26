@@ -79,35 +79,52 @@ class Retriever:
                 if doc.get("distance", 1.0) <= self.similarity_threshold
             ]
             
-            # Fallback: If no docs meet threshold, use top N docs anyway
-            if not filtered_docs and retrieved_docs:
-                logger.warning(f"No documents met similarity threshold ({self.similarity_threshold}). Using top {self.min_docs_for_llm} docs as fallback.")
-                filtered_docs = retrieved_docs[:self.min_docs_for_llm]
-            elif len(filtered_docs) < self.min_docs_for_llm and retrieved_docs:
-                # If we have some docs but not enough, add more from retrieved
-                additional_docs = [doc for doc in retrieved_docs if doc not in filtered_docs]
-                filtered_docs.extend(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])
-                logger.info(f"Added {len(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])} additional docs to meet minimum requirement")
+            # Step 3: Check if we have ANY reasonably relevant documents
+            # Set a very low threshold (0.8) below which we consider documents completely irrelevant
+            min_relevance_threshold = 0.8
+            relevant_docs = [
+                doc for doc in retrieved_docs 
+                if doc.get("distance", 1.0) <= min_relevance_threshold
+            ]
             
-            if not filtered_docs:
-                logger.warning("No documents available at all")
-                return {
-                    "answer": "I couldn't find any relevant information in the available documents.",
-                    "sources": [],
-                    "metadata": {
-                        "query": query,
-                        "collection": collection_name,
-                        "retrieved_count": len(retrieved_docs),
-                        "filtered_count": 0
-                    }
-                }
+            logger.info(f"Documents meeting similarity threshold ({self.similarity_threshold}): {len(filtered_docs)}")
+            logger.info(f"Documents meeting minimum relevance threshold ({min_relevance_threshold}): {len(relevant_docs)}")
             
-            logger.info(f"Using {len(filtered_docs)} documents after filtering and fallback")
+            # If no documents meet even the minimum relevance threshold, return empty context
+            if not relevant_docs:
+                logger.warning("No documents meet minimum relevance threshold. Sending empty context to LLM.")
+                context = ""
+            else:
+                # Fallback: If no docs meet the main threshold but some are relevant, use top N docs
+                if not filtered_docs:
+                    logger.warning(f"No documents met similarity threshold ({self.similarity_threshold}). Using top {self.min_docs_for_llm} relevant docs as fallback.")
+                    filtered_docs = relevant_docs[:self.min_docs_for_llm]
+                elif len(filtered_docs) < self.min_docs_for_llm and relevant_docs:
+                    # If we have some docs but not enough, add more from relevant docs
+                    additional_docs = [doc for doc in relevant_docs if doc not in filtered_docs]
+                    filtered_docs.extend(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])
+                    logger.info(f"Added {len(additional_docs[:self.min_docs_for_llm - len(filtered_docs)])} additional relevant docs to meet minimum requirement")
+                
+                # Step 4: Build context from filtered documents
+                context_parts = []
+                for i, doc in enumerate(filtered_docs, 1):
+                    metadata = doc.get("metadata", {})
+                    content = doc.get("content", "")
+                    author = metadata.get("author", "Unknown")
+                    posted_at = metadata.get("posted_at", "Unknown")
+                    
+                    context_parts.append(f"Document {i}:")
+                    context_parts.append(f"Author: {author}")
+                    context_parts.append(f"Posted: {posted_at}")
+                    context_parts.append(f"Content: {content}")
+                    context_parts.append("---")
+                
+                context = "\n".join(context_parts)
             
-            # Step 3: Generate response using LLM
+            logger.info(f"Final context length: {len(context)} characters")
+            
+            # Step 5: Generate response with context (or empty context)
             try:
-                context_parts = [self.build_context(doc, i+1) for i, doc in enumerate(filtered_docs)]
-                context = "\n\n".join(context_parts)
                 answer = await self.llm_manager.generate_response(
                     prompt=query,
                     context=context
@@ -120,7 +137,7 @@ class Retriever:
                 logger.error(f"Traceback: {traceback.format_exc()}")
                 raise
             
-            # Step 4: Prepare response
+            # Step 6: Prepare response
             sources = []
             for doc in filtered_docs:
                 sources.append({

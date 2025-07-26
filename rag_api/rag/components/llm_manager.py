@@ -40,7 +40,8 @@ class LLMManager:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.provider = config.get("provider", "ollama")
-        self.model = config.get("model", "mistral-nemo:12b")
+        default_model = os.getenv("RAG_LLM_MODEL", "llama3.1:8b")
+        self.model = config.get("model", default_model)
         self.temperature = config.get("temperature", 0.1)
         self.max_tokens = config.get("max_tokens", 2048)
         self.base_url = None
@@ -98,13 +99,11 @@ QUESTION: {prompt}
 
 RESPONSE (based strictly on the documents above):"""
                 else:
-                    full_prompt = f"""You are a strict document analysis assistant.
+                    full_prompt = f"""You are a strict document analysis assistant. You must respond with exactly this text and nothing else:
 
-No documents were provided for analysis.
+"I cannot answer this question as no relevant documents have been provided for analysis."
 
-QUESTION: {prompt}
-
-RESPONSE: I cannot answer this question as no relevant documents have been provided for analysis."""
+Do not include any other text, formatting, or explanations. Just return that exact sentence."""
                 
                 logger.info(f"Calling Ollama with model: {self.model}")
                 logger.info(f"Full prompt length: {len(full_prompt)} characters")
@@ -123,12 +122,12 @@ RESPONSE: I cannot answer this question as no relevant documents have been provi
                     "prompt": full_prompt,
                     "stream": False,
                     "options": {
-                        "temperature": self.temperature,
-                        "num_predict": self.max_tokens,
-                        "top_k": 10,
-                        "top_p": 0.1,
-                        "repeat_penalty": 1.2,
-                        "system": "You are a strict document-only assistant. NEVER use general knowledge. ONLY use the provided documents. If information is not in the documents, say 'I cannot find this information in the provided documents'."
+                        "temperature": 0.0,  # Make it even more deterministic
+                        "num_predict": 70000,
+                        "top_k": 1,  # Very restrictive
+                        "top_p": 0.01,  # Very restrictive
+                        "repeat_penalty": 1.0,  # No penalty to avoid confusion
+                        "system": "You are a document analysis assistant. Follow instructions exactly. If no documents, respond only with: 'I cannot answer this question as no relevant documents have been provided for analysis.'"
                     }
                 }
                 
@@ -159,12 +158,12 @@ RESPONSE: I cannot answer this question as no relevant documents have been provi
                 
         except Exception as e:
             logger.warning(f"Failed to generate response with LLM: {e}")
-            logger.warning("Using fallback response")
-            # Return a fallback response
+            logger.warning("Using strict fallback response")
+            # Return a strict fallback response - never provide answers without context
             if context:
-                return f"Based on the provided context, here's what I found: {prompt}. The context contains relevant information that could help answer your question."
+                return "I apologize, but I encountered a technical issue while processing the documents. Please try your question again."
             else:
-                return f"I understand you're asking about: {prompt}. However, I couldn't connect to the language model to provide a detailed response."
+                return "I cannot answer this question as no relevant documents have been provided for analysis."
     
     async def generate_rag_response(self, query: str, retrieved_docs: List[Dict[str, Any]]) -> str:
         """Generate a RAG response based on retrieved documents."""

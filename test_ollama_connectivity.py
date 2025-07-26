@@ -82,7 +82,7 @@ class OllamaConnectivityTester:
                 error=str(e)
             )
     
-    async def test_model_availability(self, model_name: str = "mistral-nemo:12b") -> OllamaTestResult:
+    async def test_model_availability(self, model_name: str = "llama3.1:8b") -> OllamaTestResult:
         """Test if a specific model is available."""
         start_time = time.time()
         try:
@@ -139,7 +139,7 @@ class OllamaConnectivityTester:
                 error=str(e)
             )
     
-    async def test_model_generation(self, model_name: str = "mistral-nemo:12b") -> OllamaTestResult:
+    async def test_model_generation(self, model_name: str = "llama3.1:8b") -> OllamaTestResult:
         """Test if a model can generate responses."""
         start_time = time.time()
         try:
@@ -191,7 +191,7 @@ class OllamaConnectivityTester:
                 error=str(e)
             )
     
-    async def test_general_knowledge_generation(self, model_name: str = "mistral-nemo:12b") -> OllamaTestResult:
+    async def test_general_knowledge_generation(self, model_name: str = "llama3.1:8b") -> OllamaTestResult:
         """Test if the LLM can answer a general knowledge question."""
         start_time = time.time()
         try:
@@ -288,7 +288,7 @@ Question: {query}
 Please provide a helpful answer based on the context provided. If the context doesn't contain relevant information, say so."""
             
             payload = {
-                "model": "mistral-nemo:12b",
+                "model": "llama3.1:8b",
                 "prompt": full_prompt,
                 "stream": False,
                 "options": {
@@ -457,7 +457,7 @@ Please provide a helpful answer based on the context provided. If the context do
         # Check for model availability issues
         model_test = next((r for r in self.results if "Model Availability" in r.test_name), None)
         if model_test and not model_test.success:
-            recommendations.append("📦 Pull the required model: ollama pull mistral-nemo:12b")
+            recommendations.append("📦 Pull the required model: ollama pull llama3.1:8b")
             recommendations.append("📦 Check available models: ollama list")
         
         # Check for generation issues

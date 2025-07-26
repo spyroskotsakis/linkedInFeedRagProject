@@ -76,13 +76,16 @@ check_ollama() {
 
 # Check if required model is available
 check_ollama_model() {
-    print_status "Checking Ollama model..."
-    if ! ollama list | grep -q "mistral-nemo:12b"; then
-        print_warning "Model mistral-nemo:12b not found. Pulling..."
-        ollama pull mistral-nemo:12b
+    # Get model from environment variable with fallback
+    MODEL_NAME=${RAG_LLM_MODEL:-"llama3.1:8b"}
+    
+    print_status "Checking Ollama model: $MODEL_NAME..."
+    if ! ollama list | grep -q "$MODEL_NAME"; then
+        print_warning "Model $MODEL_NAME not found. Pulling..."
+        ollama pull "$MODEL_NAME"
         print_success "Model pulled successfully"
     else
-        print_success "Model mistral-nemo:12b is available"
+        print_success "Model $MODEL_NAME is available"
     fi
 }
 

@@ -95,7 +95,7 @@ def create_env_file():
         env_config.append("# Ollama model to use")
         ollama_model = get_user_input(
             "Ollama model name",
-            default="mistral-nemo:12b",
+            default="llama3.1:8b",
             required=True
         )
         env_config.append(f"OLLAMA_MODEL={ollama_model}")
@@ -126,7 +126,7 @@ def create_env_file():
         env_config.append("OLLAMA_BASE_URL=http://host.docker.internal:11434")
         env_config.append("")
         env_config.append("# Ollama model to use")
-        env_config.append("OLLAMA_MODEL=mistral-nemo:12b")
+        env_config.append("OLLAMA_MODEL=llama3.1:8b")
         env_config.append("")
         
         env_config.append("# =============================================================================")
