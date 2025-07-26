@@ -61,14 +61,6 @@ st.markdown("""
         border-radius: 0.25rem;
         font-size: 0.9rem;
     }
-    .post-card {
-        background-color: white;
-        border: 1px solid #dee2e6;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
     .status-healthy {
         color: #28a745;
         font-weight: bold;
@@ -181,14 +173,50 @@ def get_engagement_value(row, field, default=0):
     return default
 
 def get_post_timestamp(row):
-    """Extract timestamp from either new or old format."""
+    """Extract and format post timestamp."""
     try:
-        # Try new format: timestamp
-        if hasattr(row, 'timestamp') and row.timestamp:
-            return row.timestamp
-        # Try old format: posted_at
-        elif hasattr(row, 'posted_at') and row.posted_at:
-            return row.posted_at
+        # Try new format: timestamp field
+        if hasattr(row, 'timestamp') and getattr(row, 'timestamp'):
+            timestamp = getattr(row, 'timestamp')
+            if timestamp:
+                return timestamp
+    except:
+        pass
+    
+    try:
+        # Try old format: posted_at field
+        if hasattr(row, 'posted_at') and getattr(row, 'posted_at'):
+            posted_at = getattr(row, 'posted_at')
+            if posted_at:
+                return posted_at
+    except:
+        pass
+    
+    return None
+
+def get_avatar_url(row):
+    """Extract avatar URL from author_metadata."""
+    try:
+        if hasattr(row, 'author_metadata') and getattr(row, 'author_metadata'):
+            author_metadata = getattr(row, 'author_metadata')
+            if isinstance(author_metadata, dict) and 'avatar_url' in author_metadata:
+                avatar_url = author_metadata['avatar_url']
+                if avatar_url and avatar_url.strip():
+                    return avatar_url
+    except:
+        pass
+    
+    return None
+
+def get_post_type(row):
+    """Extract post_type from post_metadata."""
+    try:
+        if hasattr(row, 'post_metadata') and getattr(row, 'post_metadata'):
+            post_metadata = getattr(row, 'post_metadata')
+            if isinstance(post_metadata, dict) and 'post_type' in post_metadata:
+                post_type = post_metadata['post_type']
+                if post_type and post_type.strip():
+                    return post_type
     except:
         pass
     return None
@@ -352,7 +380,22 @@ def main():
         st.markdown("### 👀 Sample Posts")
         sample_df = df.head(3)
         for i, row in enumerate(sample_df.to_pandas().itertuples()):
-            with st.expander(f"Post {i+1}: {getattr(row, 'author', 'Unknown Author')}"):
+            author = getattr(row, 'author', 'Unknown Author')
+            avatar_url = get_avatar_url(row)
+            post_type = get_post_type(row)
+            
+            with st.expander(f"Post {i+1}: {author}"):
+                # Author info with avatar
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    if avatar_url:
+                        st.image(avatar_url, width=40)
+                    else:
+                        st.markdown("👤")
+                with col2:
+                    st.markdown(f"**{author}**")
+                    st.markdown("**Post Content:**")
+                
                 content = getattr(row, 'content', 'No content')
                 st.write(content[:200] + "..." if len(content) > 200 else content)
                 
@@ -370,6 +413,8 @@ def main():
                     url = getattr(row, 'url', '')
                     if url:
                         st.markdown(f"[🔗 View]({url})")
+                    if post_type:
+                        st.markdown(f"**Post Type:** {post_type}")
     
     with tab2:
         st.header("📄 Interactive Data Grid")
@@ -432,13 +477,19 @@ def main():
             # Display posts
             for i, row in enumerate(df_page.to_pandas().itertuples()):
                 with st.container():
-                    st.markdown('<div class="post-card">', unsafe_allow_html=True)
-                    
                     # Author and timestamp
                     col1, col2 = st.columns([3, 1])
                     with col1:
                         author = getattr(row, 'author', 'Unknown Author')
-                        st.markdown(f"**👤 {author}**")
+                        avatar_url = get_avatar_url(row)
+                        post_type = get_post_type(row)
+                        
+                        # Display avatar and author name side by side without nested columns
+                        if avatar_url:
+                            st.image(avatar_url, width=30)
+                            st.markdown(f"**{author}**")
+                        else:
+                            st.markdown(f"**👤 {author}**")
                     with col2:
                         timestamp = get_post_timestamp(row)
                         if timestamp:
@@ -453,6 +504,11 @@ def main():
                     if url:
                         st.markdown(f"🔗 **[View on LinkedIn]({url})**")
                     
+                    # Post Type
+                    post_type = get_post_type(row)
+                    if post_type:
+                        st.markdown(f"**Post Type:** {post_type}")
+                    
                     # Engagement bar
                     if show_engagement:
                         col1, col2, col3 = st.columns(3)
@@ -466,7 +522,8 @@ def main():
                             shares = get_engagement_value(row, 'shares', 0)
                             st.write(f"🔗 {shares} shares")
                     
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    # Add some spacing between posts
+                    st.markdown("---")
     
     with tab4:
         st.header("📈 Analytics")
@@ -494,7 +551,23 @@ def main():
             top_posts = df_with_scores.sort("engagement_score", descending=True).head(5)
             
             for i, row in enumerate(top_posts.to_pandas().itertuples()):
-                with st.expander(f"#{i+1} - {getattr(row, 'author', 'Unknown')} (Score: {getattr(row, 'engagement_score', 0)})"):
+                author = getattr(row, 'author', 'Unknown')
+                score = getattr(row, 'engagement_score', 0)
+                avatar_url = get_avatar_url(row)
+                post_type = get_post_type(row)
+                
+                with st.expander(f"#{i+1} - {author} (Score: {score})"):
+                    # Author info with avatar
+                    col1, col2 = st.columns([1, 4])
+                    with col1:
+                        if avatar_url:
+                            st.image(avatar_url, width=50)
+                        else:
+                            st.markdown("👤")
+                    with col2:
+                        st.markdown(f"**{author}**")
+                        st.markdown(f"**Engagement Score: {score}**")
+                    
                     content = getattr(row, 'content', 'No content')
                     st.write(content[:300] + "..." if len(content) > 300 else content)
                     
@@ -508,6 +581,8 @@ def main():
                     with col3:
                         shares = get_engagement_value(row, 'shares', 0)
                         st.write(f"🔗 {shares} shares")
+                    if post_type:
+                        st.markdown(f"**Post Type:** {post_type}")
         
         except Exception as e:
             st.error(f"Failed to calculate analytics: {e}")
